@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { useState } from 'react'
 
 import { authClient } from '@/services/auth'
 
@@ -11,7 +11,7 @@ export function LoginPage() {
 
   const isValid = email.includes('@') && password.length > 0
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -116,7 +116,7 @@ export function RegisterPage() {
     password.length >= 8 &&
     (showPassword || password === confirmPassword)
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     setError('')
 
@@ -260,7 +260,7 @@ export function ForgotPasswordPage() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -375,7 +375,7 @@ export function ResetPasswordPage() {
     )
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     setError('')
 

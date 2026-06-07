@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { createAuthClient } from 'better-auth/react'
 
 const authClient = createAuthClient({
@@ -12,7 +12,7 @@ export default function SignInForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     setError('')
     setLoading(true)
