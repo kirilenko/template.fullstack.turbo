@@ -26,10 +26,7 @@
     },
     "dev:worker": {
       "cache": false,
-      "env": [
-        "DATABASE_URL",
-        "REDIS_URL"
-      ],
+      "env": ["DATABASE_URL", "REDIS_URL"],
       "persistent": true
     },
     "start:worker": {
@@ -45,12 +42,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "env": [
-        "PUBLIC_API_URL",
-        "PUBLIC_TIMESTAMP",
-        "DATABASE_URL",
-        "SITE_URL"
-      ],
+      "env": ["PUBLIC_API_URL", "PUBLIC_TIMESTAMP", "DATABASE_URL", "SITE_URL"],
       "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
       "outputs": ["dist/**", ".astro/**"]
     },

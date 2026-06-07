@@ -46,7 +46,7 @@ export function Layout(): JSX.Element {
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
             <button
-              onClick={() => void signOut()}
+              onClick={() => { signOut().catch(console.error) }}
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               Выйти

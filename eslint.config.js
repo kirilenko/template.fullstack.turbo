@@ -49,6 +49,13 @@ export default [
     },
   },
   {
+    // TanStack Router uses `throw redirect()` — not an Error object by design
+    files: ['apps/web-control/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/only-throw-error': 'off',
+    },
+  },
+  {
     files: ['apps/service-api/**/*.ts'],
     rules: {
       'no-console': ['error', { allow: ['log', 'info', 'warn', 'error'] }],
