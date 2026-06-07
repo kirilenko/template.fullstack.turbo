@@ -1,0 +1,204 @@
+name: Test, build and push Docker images
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+      - stage
+      - dev
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test_build:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version-file: '.nvmrc'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v5
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  push:
+    needs: test_build
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/main'
+    name: Push Docker images
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Get branch name
+        run: |
+          BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "PROJECT_NAME=app" >> $GITHUB_ENV
+
+      - name: Get commit hash
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect if full rebuild needed
+        id: first-push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # First push to branch — build everything
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "build_all=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # If the previous CI run failed, images were never pushed — rebuild all
+          PREV_CONCLUSION=$(gh api \
+            "repos/${{ github.repository }}/actions/runs?head_sha=${{ github.event.before }}&per_page=5" \
+            --jq '[.workflow_runs[] | select(.name == "${{ github.workflow }}")] | first | .conclusion' \
+            2>/dev/null || echo "unknown")
+
+          if [ "$PREV_CONCLUSION" = "success" ]; then
+            echo "build_all=false" >> $GITHUB_OUTPUT
+          else
+            echo "build_all=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check changed files
+        if: steps.first-push.outputs.build_all == 'false'
+        id: changed-files
+        uses: dorny/paths-filter@v4
+        with:
+          base: ${{ github.event.before }}
+          filters: |
+            service-api:
+              - 'apps/service-api/**'
+              - 'pnpm-lock.yaml'
+              - 'turbo.json'
+              - '.nvmrc'
+              - '.github/workflows/ci.yml'
+            web-control:
+              - 'apps/web-control/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - 'turbo.json'
+              - '.nvmrc'
+              - '.env.*'
+              - '.github/workflows/ci.yml'
+            web-public:
+              - 'apps/web-public/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - 'turbo.json'
+              - '.nvmrc'
+              - '.env.*'
+              - '.github/workflows/ci.yml'
+
+      - name: Push Service-API
+        if: steps.first-push.outputs.build_all == 'true' || steps.changed-files.outputs.service-api == 'true'
+        run: |
+          APP_NAME=service-api
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:${{ env.COMMIT_HASH }} \
+            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:latest \
+            -f apps/service-api/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }} --all-tags
+
+      - name: Push Web-Control
+        if: steps.first-push.outputs.build_all == 'true' || steps.changed-files.outputs.web-control == 'true'
+        run: |
+          APP_NAME=web-control
+          docker build \
+            --build-arg BRANCH=${{ env.BRANCH }} \
+            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:${{ env.COMMIT_HASH }} \
+            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:latest \
+            -f apps/web-control/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }} --all-tags
+
+      - name: Push Web-Public
+        if: steps.first-push.outputs.build_all == 'true' || steps.changed-files.outputs.web-public == 'true'
+        run: |
+          APP_NAME=web-public
+          docker build \
+            --build-arg BRANCH=${{ env.BRANCH }} \
+            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:${{ env.COMMIT_HASH }} \
+            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:latest \
+            -f apps/web-public/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }} --all-tags
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DEPLOY — раскомментируйте для активации автодеплоя через Dokploy webhook
+  #
+  # Настройка:
+  #   1. В Dokploy создайте Compose-приложение для каждого окружения (main/stage/dev)
+  #      и скопируйте URL webhook из Settings → Deployments → Webhook URL
+  #   2. В GitHub → Settings → Secrets → Actions добавьте секреты:
+  #        WEBHOOK_IMAGES_PULLING_URL_MAIN   — webhook URL для main
+  #        WEBHOOK_IMAGES_PULLING_URL_STAGE  — webhook URL для stage
+  #        WEBHOOK_IMAGES_PULLING_URL_DEV    — webhook URL для dev
+  #   3. Раскомментируйте job ниже
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  # trigger_deploy:
+  #   needs: push
+  #   if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/main'
+  #   name: Trigger deployment
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Get branch name
+  #       run: |
+  #         BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+  #         echo "BRANCH_UPPERCASE=${BRANCH^^}" >> $GITHUB_ENV
+  #
+  #     - name: Trigger Webhook for pulling images
+  #       uses: distributhor/workflow-webhook@v3
+  #       with:
+  #         webhook_url: ${{ secrets[format('WEBHOOK_IMAGES_PULLING_URL_{0}', env.BRANCH_UPPERCASE)] }}
