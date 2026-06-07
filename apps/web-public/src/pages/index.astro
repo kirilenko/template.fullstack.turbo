@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@/layouts/base-layout.astro'
+---
+
+<BaseLayout title="App" description="Your application description">
+  <main class="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center gap-6 p-4 text-center">
+    <h1 class="text-5xl font-bold tracking-tight text-foreground">Welcome</h1>
+    <p class="max-w-md text-lg text-muted-foreground">
+      Minimal Astro + React landing page template. Replace this with your content.
+    </p>
+    <a
+      href="/sign-in"
+      class="inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+    >
+      Get started
+    </a>
+  </main>
+</BaseLayout>

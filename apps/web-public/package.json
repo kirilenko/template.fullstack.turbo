@@ -1,0 +1,30 @@
+{
+  "name": "@apps/web-public",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf node_modules dist .turbo .astro",
+    "dev": "astro dev --host",
+    "typecheck": "astro check",
+    "build": "astro build",
+    "start": "astro preview"
+  },
+  "dependencies": {
+    "@apps/service-api": "workspace:*",
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/react": "^5.0.4",
+    "@packages/config-tailwind": "workspace:*",
+    "astro": "^6.3.1",
+    "better-auth": "^1.6.10",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~6.0.3"
+  }
+}
