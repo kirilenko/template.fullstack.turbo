@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "exports": {
+    "./src/*": "./src/*.ts"
+  },
   "scripts": {
     "clean": "rm -rf node_modules dist .turbo",
     "dev": "tsx watch --env-file=../../.env.local --env-file-if-exists=../../.env.build.local src/index.ts",

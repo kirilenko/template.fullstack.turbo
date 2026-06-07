@@ -266,7 +266,7 @@ export function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      await authClient.forgetPassword({
+      await authClient.requestPasswordReset({
         email,
         redirectTo: `${window.location.origin}/reset-password`,
       })
