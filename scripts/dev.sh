@@ -6,8 +6,8 @@ export COMPOSE_PROJECT_NAME="app-dev"
 # Sync ports from ../../ports.yml → .env.ports.local
 ./scripts/sync-ports.sh
 
-# Build env file
-cat .env .env.local .env.ports.local 2>/dev/null > .env.build.local || cat .env > .env.build.local
+# Build env file (all files are optional except .env.ports.local)
+cat /dev/null .env .env.local .env.ports.local 2>/dev/null > .env.build.local
 
 # Start Docker services
 echo "Starting Docker services..."
