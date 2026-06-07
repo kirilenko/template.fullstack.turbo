@@ -1,0 +1,39 @@
+{
+  "name": "@apps/service-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf node_modules dist .turbo",
+    "dev": "tsx watch --env-file=../../.env.local --env-file-if-exists=../../.env.build.local src/index.ts",
+    "dev:worker": "tsx watch --env-file=../../.env.local --env-file-if-exists=../../.env.build.local src/worker.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run --pass-with-no-tests",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "start:worker": "node dist/worker.js",
+    "db:generate": "tsx node_modules/drizzle-kit/bin.cjs generate",
+    "db:migrate": "tsx node_modules/drizzle-kit/bin.cjs migrate",
+    "db:push": "tsx node_modules/drizzle-kit/bin.cjs push",
+    "db:seed": "tsx --env-file=../../.env.local scripts/seed.ts",
+    "db:studio": "tsx node_modules/drizzle-kit/bin.cjs studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.2",
+    "better-auth": "^1.6.10",
+    "bullmq": "^5.76.7",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.18",
+    "nodemailer": "^8.0.7",
+    "postgres": "^3.4.9",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "@types/nodemailer": "^8.0.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.21.0",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.6"
+  }
+}
