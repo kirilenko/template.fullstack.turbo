@@ -1,0 +1,64 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env", "**/.env.*local"],
+  "tasks": {
+    "clean": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "env": [
+        "ADMIN_EMAILS",
+        "PUBLIC_API_URL",
+        "PUBLIC_APP_URL",
+        "PUBLIC_TIMESTAMP",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "BETTER_AUTH_SECRET",
+        "PORT",
+        "PORT_VITE_CONTROL",
+        "PORT_ASTRO_PUBLIC",
+        "PORT_POSTGRES",
+        "PORT_REDIS"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.dev"],
+      "persistent": true
+    },
+    "dev:worker": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "REDIS_URL"
+      ],
+      "persistent": true
+    },
+    "start:worker": {
+      "cache": false,
+      "dependsOn": ["^start:worker"],
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test": {
+      "dependsOn": []
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "PUBLIC_API_URL",
+        "PUBLIC_TIMESTAMP",
+        "DATABASE_URL",
+        "SITE_URL"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
+      "outputs": ["dist/**", ".astro/**"]
+    },
+    "start": {
+      "cache": false,
+      "dependsOn": ["^start"],
+      "persistent": true
+    }
+  },
+  "ui": "tui"
+}

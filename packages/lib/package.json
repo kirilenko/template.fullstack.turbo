@@ -1,0 +1,33 @@
+{
+  "name": "@packages/lib",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./style-helpers": "./src/style-helpers/index.ts",
+    "./env": "./src/env/index.ts",
+    "./theme": "./src/theme/index.ts",
+    "./router": "./src/router/index.ts",
+    "./i18n": "./src/i18n/index.ts"
+  },
+  "dependencies": {
+    "@packages/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "i18next": "^26.1.0",
+    "i18next-http-backend": "^4.0.0",
+    "lucide-react": "^1.14.0",
+    "react-i18next": "^17.0.7",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.12"
+  }
+}

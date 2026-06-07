@@ -1,0 +1,28 @@
+{
+  "name": "@packages/config-eslint",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./react": "./react.config.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint-config-k8": "^1.5.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-hooks": "^0.4.3",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "globals": "^17.6.0",
+    "typescript-eslint": "^8.59.2"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": ">=5.0.0"
+  }
+}

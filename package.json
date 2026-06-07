@@ -1,0 +1,66 @@
+{
+  "name": "template-fullstack-turbo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "turbo run clean && rm -rf node_modules .turbo",
+    "setup": "scripts/setup-env.sh && pnpm i",
+    "dev": "scripts/dev.sh",
+    "dev:turbo": "cat .env .env.local > .env.build.local && dotenv -e .env.build.local -- turbo run dev",
+    "dev:stop": "scripts/dev-stop.sh",
+    "lint": "turbo run typecheck && eslint . --fix && prettier --write \"./*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
+    "test": "turbo run test",
+    "build:local": "cat .env .env.local > .env.build.local && dotenv -e .env.build.local -- turbo run build",
+    "start:local": "turbo run start",
+    "build": "dotenv -e .env -- turbo run build",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:start": "docker compose start",
+    "db:stop": "docker compose stop",
+    "db:generate": "pnpm --filter @apps/service-api db:generate",
+    "db:migrate": "pnpm --filter @apps/service-api db:migrate",
+    "db:push": "pnpm --filter @apps/service-api db:push",
+    "db:seed": "pnpm --filter @apps/service-api db:seed",
+    "db:studio": "pnpm --filter @apps/service-api db:studio",
+    "db:backup": "docker compose exec -T postgres pg_dump -U app app > backup.sql",
+    "db:restore": "docker compose exec -T postgres psql -U app app < backup.sql",
+    "db:reset": "docker compose down -v && docker compose up -d",
+    "redis:cli": "docker compose exec redis redis-cli",
+    "redis:flush": "docker compose exec redis redis-cli FLUSHALL",
+    "storybook": "pnpm --filter @packages/ui storybook"
+  },
+  "devDependencies": {
+    "@packages/config-eslint": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^10.2.1",
+    "prettier": "3.8.3",
+    "prettier-plugin-css-order": "^2.2.0",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "turbo": "2.9.12"
+  },
+  "engines": {
+    "node": ">=24.12.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "pnpm@10.26.0",
+  "pnpm": {
+    "overrides": {
+      "react@>=19.2.0": "19.2.6",
+      "react-dom@>=19.2.0": "19.2.6",
+      "esbuild": ">=0.25.0"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "eslint-plugin-react-refresh": ">=0.4.0",
+        "@eslint/js": ">=9.0.0",
+        "eslint": ">=9.0.0",
+        "react": ">=19.1.0",
+        "react-dom": ">=19.1.0",
+        "@types/react": ">=19.1.0"
+      }
+    }
+  }
+}
