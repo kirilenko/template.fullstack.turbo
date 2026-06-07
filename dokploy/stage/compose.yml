@@ -1,0 +1,155 @@
+name: app-stage
+
+services:
+  postgres:
+    container_name: app-postgres-stage
+    image: postgres:17-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    container_name: app-redis-stage
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  service-api:
+    container_name: app-service-api-stage
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-service-api-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - dokploy-network
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+      APP_NAME: ${APP_NAME}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL}
+      PUBLIC_API_URL: ${PUBLIC_API_URL}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN}
+      COOKIE_PREFIX: ${COOKIE_PREFIX}
+      ADMIN_EMAILS: ${ADMIN_EMAILS}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+    labels:
+      - environment=stage
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+
+      - traefik.http.routers.service-api-stage.rule=Host(`api.stage.yourdomain.com`)
+      - traefik.http.routers.service-api-stage.entrypoints=websecure
+      - traefik.http.routers.service-api-stage.tls.certresolver=letsencrypt
+      - traefik.http.services.service-api-stage.loadbalancer.server.port=3001
+
+      - traefik.http.routers.service-api-stage-http.rule=Host(`api.stage.yourdomain.com`)
+      - traefik.http.routers.service-api-stage-http.entrypoints=web
+      - traefik.http.routers.service-api-stage-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
+      - traefik.http.middlewares.${PROJECT_NAME}-${BRANCH}-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.${PROJECT_NAME}-${BRANCH}-https.redirectscheme.permanent=true
+
+  worker:
+    container_name: app-worker-stage
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-service-api-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    # deploy:
+    #   replicas: 2
+    command: ["node", "dist/worker.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+
+  web-control:
+    container_name: app-web-control-stage
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-web-control-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+    labels:
+      - environment=stage
+      - traefik.enable=true
+
+      - traefik.http.routers.web-control-${BRANCH}.rule=Host(`control.stage.yourdomain.com`)
+      - traefik.http.routers.web-control-${BRANCH}.entrypoints=websecure
+      - traefik.http.routers.web-control-${BRANCH}.tls.certResolver=letsencrypt
+      - traefik.http.services.web-control-${BRANCH}.loadbalancer.server.port=80
+
+      - traefik.http.routers.web-control-${BRANCH}-http.rule=Host(`control.stage.yourdomain.com`)
+      - traefik.http.routers.web-control-${BRANCH}-http.entrypoints=web
+      - traefik.http.routers.web-control-${BRANCH}-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
+
+  web-public:
+    container_name: app-web-public-stage
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-web-public-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+    labels:
+      - environment=stage
+      - traefik.enable=true
+
+      - traefik.http.routers.web-public-${BRANCH}.rule=Host(`stage.yourdomain.com`)
+      - traefik.http.routers.web-public-${BRANCH}.entrypoints=websecure
+      - traefik.http.routers.web-public-${BRANCH}.tls.certresolver=letsencrypt
+      - traefik.http.services.web-public-${BRANCH}.loadbalancer.server.port=80
+
+      - traefik.http.routers.web-public-${BRANCH}-http.rule=Host(`stage.yourdomain.com`)
+      - traefik.http.routers.web-public-${BRANCH}-http.entrypoints=web
+      - traefik.http.routers.web-public-${BRANCH}-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  internal:
+  dokploy-network:
+    external: true

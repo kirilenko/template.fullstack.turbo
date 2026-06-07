@@ -1,0 +1,223 @@
+name: app-main
+
+services:
+  postgres:
+    container_name: app-postgres-prod
+    image: postgres:17-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    container_name: app-redis-prod
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  service-api:
+    container_name: app-service-api-prod
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-service-api-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - dokploy-network
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+      APP_NAME: ${APP_NAME}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL}
+      PUBLIC_API_URL: ${PUBLIC_API_URL}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN}
+      COOKIE_PREFIX: ${COOKIE_PREFIX}
+      ADMIN_EMAILS: ${ADMIN_EMAILS}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+    labels:
+      - environment=main
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+
+      # HTTPS
+      - traefik.http.routers.service-api.rule=Host(`api.yourdomain.com`)
+      - traefik.http.routers.service-api.entrypoints=websecure
+      - traefik.http.routers.service-api.tls.certresolver=letsencrypt
+      - traefik.http.services.service-api.loadbalancer.server.port=3001
+
+      # HTTP → HTTPS
+      - traefik.http.routers.service-api-http.rule=Host(`api.yourdomain.com`)
+      - traefik.http.routers.service-api-http.entrypoints=web
+      - traefik.http.routers.service-api-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
+      - traefik.http.middlewares.${PROJECT_NAME}-${BRANCH}-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.${PROJECT_NAME}-${BRANCH}-https.redirectscheme.permanent=true
+
+  worker:
+    container_name: app-worker-prod
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-service-api-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    # Один образ, другая команда — worker читает задачи из очереди BullMQ.
+    # Для горизонтального масштабирования раскомментируйте deploy.replicas:
+    # deploy:
+    #   replicas: 2
+    command: ["node", "dist/worker.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+
+  web-control:
+    container_name: app-web-control-prod
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-web-control-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+    labels:
+      - environment=main
+      - traefik.enable=true
+
+      # HTTPS
+      - traefik.http.routers.web-control-${BRANCH}.rule=Host(`control.yourdomain.com`)
+      - traefik.http.routers.web-control-${BRANCH}.entrypoints=websecure
+      - traefik.http.routers.web-control-${BRANCH}.tls.certResolver=letsencrypt
+      - traefik.http.services.web-control-${BRANCH}.loadbalancer.server.port=80
+
+      # HTTP → HTTPS
+      - traefik.http.routers.web-control-${BRANCH}-http.rule=Host(`control.yourdomain.com`)
+      - traefik.http.routers.web-control-${BRANCH}-http.entrypoints=web
+      - traefik.http.routers.web-control-${BRANCH}-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
+
+  web-public:
+    container_name: app-web-public-prod
+    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-web-public-${BRANCH}:${TAG}
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+    labels:
+      - environment=main
+      - traefik.enable=true
+
+      # HTTPS — main domain
+      - traefik.http.routers.web-public.rule=Host(`yourdomain.com`)
+      - traefik.http.routers.web-public.entrypoints=websecure
+      - traefik.http.routers.web-public.tls.certresolver=letsencrypt
+      - traefik.http.services.web-public.loadbalancer.server.port=80
+
+      # HTTP → HTTPS
+      - traefik.http.routers.web-public-http.rule=Host(`yourdomain.com`)
+      - traefik.http.routers.web-public-http.entrypoints=web
+      - traefik.http.routers.web-public-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
+
+      # www → main domain redirect
+      - traefik.http.routers.www-redirect.rule=Host(`www.yourdomain.com`)
+      - traefik.http.routers.www-redirect.entrypoints=websecure
+      - traefik.http.routers.www-redirect.tls.certresolver=letsencrypt
+      - traefik.http.routers.www-redirect.middlewares=web-public-www-redirect
+      - traefik.http.routers.www-http.rule=Host(`www.yourdomain.com`)
+      - traefik.http.routers.www-http.entrypoints=web
+      - traefik.http.routers.www-http.middlewares=web-public-www-redirect
+      - traefik.http.middlewares.web-public-www-redirect.redirectregex.regex=^https?://www\.yourdomain\.com/(.*)
+      - traefik.http.middlewares.web-public-www-redirect.redirectregex.replacement=https://yourdomain.com/$1
+      - traefik.http.middlewares.web-public-www-redirect.redirectregex.permanent=true
+
+  pg-backup:
+    container_name: app-pg-backup-prod
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_PREFIX: ${S3_PREFIX}
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${S3_REGION:-us-east-1}
+      BACKUP_KEEP_DAYS: "7"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        command -v aws > /dev/null 2>&1 || apk add --no-cache aws-cli > /dev/null 2>&1
+        cat > /backup.sh << 'SCRIPT'
+        #!/bin/sh
+        set -e
+        FNAME="$${PGDATABASE}_$$(date +%Y-%m-%dT%H%M%S).sql.gz"
+        echo "[$$(date)] Backup: $$FNAME"
+        pg_dump --clean --if-exists | gzip > "/tmp/$$FNAME"
+        aws --endpoint-url "$$S3_ENDPOINT" s3 cp "/tmp/$$FNAME" "s3://$$S3_BUCKET/$$S3_PREFIX/$$FNAME"
+        rm -f "/tmp/$$FNAME"
+        echo "[$$(date)] Uploaded: $$FNAME"
+        aws --endpoint-url "$$S3_ENDPOINT" s3 ls "s3://$$S3_BUCKET/$$S3_PREFIX/" | \
+          sort -r | awk -v n="$$BACKUP_KEEP_DAYS" 'NR>n{print $$4}' | while read F; do
+            [ -n "$$F" ] && \
+              aws --endpoint-url "$$S3_ENDPOINT" s3 rm "s3://$$S3_BUCKET/$$S3_PREFIX/$$F" && \
+              echo "[$$(date)] Deleted: $$F"
+          done
+        echo "[$$(date)] Done"
+        SCRIPT
+        chmod +x /backup.sh
+        echo "0 3 * * * /backup.sh >> /proc/1/fd/1 2>&1" | crontab -
+        echo "[$$(date)] Backup scheduler started (daily 03:00 UTC, keep $$BACKUP_KEEP_DAYS days)"
+        crond -f -l 2
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  internal:
+  dokploy-network:
+    external: true
