@@ -23,9 +23,9 @@ until docker compose exec -T postgres pg_isready -U app > /dev/null 2>&1; do
 done
 sleep 2
 
-# Run migrations
-echo "Running migrations..."
-dotenv -e .env.build.local -- pnpm --filter @apps/service-api db:migrate
+# Push schema to DB (dev only — use db:generate + db:migrate for production)
+echo "Pushing schema..."
+dotenv -e .env.build.local -- pnpm --filter @apps/service-api db:push:force
 
 echo "Ready! Starting all apps via turbo..."
 dotenv -e .env.build.local -- turbo run dev dev:worker
