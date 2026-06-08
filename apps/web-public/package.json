@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "rm -rf node_modules dist .turbo .astro",
-    "dev": "astro dev --host",
+    "dev": "dotenv -e ../../.env.ports.local -e ../../.env.local -- astro dev --host",
     "typecheck": "astro check",
     "build": "astro build",
     "start": "astro preview"
