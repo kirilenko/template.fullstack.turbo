@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 ]
 
 export function Layout(): JSX.Element {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const location = useLocation()
 
   return (
