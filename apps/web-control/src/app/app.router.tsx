@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-router'
 
 import { paths } from '@/config'
-import { LoginPage, LogoutPage, UnauthorizedPage } from '@/modules/auth'
+import { LoginPage, LogoutPage, RegisterPage, UnauthorizedPage } from '@/modules/auth'
 import { HomePage } from '@/modules/home'
 
 import { Layout } from './layout'
@@ -95,6 +95,12 @@ const loginRoute = createRoute({
   path: paths.login,
 })
 
+const registerRoute = createRoute({
+  component: RegisterPage,
+  getParentRoute: () => publicOnlyRoute,
+  path: paths.register,
+})
+
 const unauthorizedRoute = createRoute({
   component: UnauthorizedPage,
   getParentRoute: () => layoutRoute,
@@ -107,7 +113,7 @@ const routeTree = rootRoute.addChildren([
     privateRoute.addChildren([logoutRoute]),
     unauthorizedRoute,
   ]),
-  publicOnlyRoute.addChildren([loginRoute]),
+  publicOnlyRoute.addChildren([loginRoute, registerRoute]),
 ])
 
 export const router = createRouter({
