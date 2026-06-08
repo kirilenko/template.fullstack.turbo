@@ -58,7 +58,8 @@ jobs:
 
   push:
     needs: test_build
-    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/main'
+    if: false # раскомментируйте условие ниже когда будете готовы пушить образы
+    # if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/main'
     name: Push Docker images
     runs-on: ubuntu-latest
     permissions:

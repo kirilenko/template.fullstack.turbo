@@ -18,6 +18,8 @@ COPY --from=prepare /app/out/json/ .
 RUN pnpm install --frozen-lockfile
 COPY --from=prepare /app/out/full/ .
 RUN pnpm turbo build --filter=@apps/service-api
+# Ensure drizzle/ exists even if no migrations have been generated yet
+RUN mkdir -p /app/apps/service-api/drizzle
 RUN pnpm --filter @apps/service-api --prod deploy --legacy /app/deployed
 
 # ---
