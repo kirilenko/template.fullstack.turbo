@@ -7,6 +7,7 @@ import { useAuth } from '@/services/auth'
 const NAV_ITEMS = [
   { label: 'Dashboard', to: paths.home },
   { label: 'Профиль', to: paths.profile },
+  // Добавляй новые разделы сюда
 ]
 
 export function Layout(): JSX.Element {
@@ -17,7 +18,7 @@ export function Layout(): JSX.Element {
     <div className="flex h-full">
       <aside className="w-56 shrink-0 border-r bg-sidebar">
         <div className="flex h-14 items-center border-b px-4">
-          <span className="font-semibold text-sidebar-foreground">App</span>
+          <span className="font-semibold text-sidebar-foreground">Admin</span>
         </div>
         <nav className="flex flex-col gap-1 p-2">
           {NAV_ITEMS.map(({ label, to }) => {
@@ -45,12 +46,12 @@ export function Layout(): JSX.Element {
           <div />
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <button
-              onClick={() => { signOut().catch(console.error) }}
+            <Link
+              to={paths.logout}
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               Выйти
-            </button>
+            </Link>
           </div>
         </header>
         <main className="flex-1 overflow-auto">

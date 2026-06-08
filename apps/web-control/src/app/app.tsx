@@ -7,15 +7,20 @@ import { AuthProvider, useAuth } from '@/services/auth'
 import { router } from './app.router'
 
 function AppRouter(): JSX.Element {
-  const { isAuthenticated, isLoaded } = useAuth()
+  const { isAuthenticated, isLoaded, role } = useAuth()
 
   useEffect(() => {
     if (isLoaded) void router.invalidate()
-  }, [isAuthenticated, isLoaded])
+  }, [isAuthenticated, isLoaded, role])
 
   if (!isLoaded) return <></>
 
-  return <RouterProvider router={router} context={{ isAuthenticated }} />
+  return (
+    <RouterProvider
+      router={router}
+      context={{ isAdmin: role === 'admin', isAuthenticated }}
+    />
+  )
 }
 
 export function App(): JSX.Element {

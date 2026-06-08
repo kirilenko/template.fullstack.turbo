@@ -1,7 +1,1 @@
-export {
-  ForgotPasswordPage,
-  LoginPage,
-  LogoutPage,
-  RegisterPage,
-  ResetPasswordPage,
-} from './auth.pages'
+export { LoginPage, LogoutPage, UnauthorizedPage } from './auth.pages'
