@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/base-layout.astro'
+import GetStartedButton from '@/components/get-started-button'
 ---
 
 <BaseLayout title="App" description="Your application description">
@@ -8,11 +9,6 @@ import BaseLayout from '@/layouts/base-layout.astro'
     <p class="max-w-md text-lg text-muted-foreground">
       Minimal Astro + React landing page template. Replace this with your content.
     </p>
-    <a
-      href="/sign-in"
-      class="inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-    >
-      Get started
-    </a>
+    <GetStartedButton client:load />
   </main>
 </BaseLayout>
