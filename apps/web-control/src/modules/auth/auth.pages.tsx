@@ -23,6 +23,15 @@ export function LoginPage() {
         setLoading(false)
         return
       }
+
+      const session = await authClient.getSession()
+      if (session.data?.user?.role !== 'admin') {
+        await authClient.signOut()
+        setError('Этот аккаунт не является администратором. Обратитесь к владельцу системы.')
+        setLoading(false)
+        return
+      }
+
       window.location.href = '/'
     } catch {
       setError('Ошибка входа')
