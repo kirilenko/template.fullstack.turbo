@@ -128,7 +128,12 @@ export function RegisterPage() {
     setLoading(true)
 
     try {
-      const result = await authClient.signUp.email({ name, email, password })
+      const result = await authClient.signUp.email({
+        name,
+        email,
+        password,
+        callbackURL: window.location.origin,
+      })
       if (result.error) {
         setError(result.error.message ?? 'Ошибка регистрации')
         setLoading(false)
