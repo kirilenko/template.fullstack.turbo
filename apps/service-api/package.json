@@ -8,8 +8,8 @@
   },
   "scripts": {
     "clean": "rm -rf node_modules dist .turbo",
-    "dev": "tsx watch --env-file=../../.env.local --env-file-if-exists=../../.env.build.local src/index.ts",
-    "dev:worker": "tsx watch --env-file=../../.env.local --env-file-if-exists=../../.env.build.local src/worker.ts",
+    "dev": "tsx watch --env-file-if-exists=../../.env.local --env-file-if-exists=../../.env.build.local src/index.ts",
+    "dev:worker": "tsx watch --env-file-if-exists=../../.env.local --env-file-if-exists=../../.env.build.local src/worker.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest --run --pass-with-no-tests",
     "build": "tsc -p tsconfig.build.json",
