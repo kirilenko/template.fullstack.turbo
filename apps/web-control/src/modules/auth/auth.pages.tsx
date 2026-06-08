@@ -168,7 +168,7 @@ export function RegisterPage() {
     name.trim().length > 0 &&
     email.includes('@') &&
     password.length >= 8 &&
-    password === confirmPassword
+    (showPassword || password === confirmPassword)
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
@@ -270,27 +270,21 @@ export function RegisterPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="confirm-password" className="text-sm font-medium">Подтверждение пароля</label>
-            <div className="relative">
+          {!showPassword && (
+            <div className="space-y-2">
+              <label htmlFor="confirm-password" className="text-sm font-medium">Подтверждение пароля</label>
               <input
                 id="confirm-password"
-                type={showPassword ? 'text' : 'password'}
+                type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                minLength={8}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 autoComplete="new-password"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-              </button>
             </div>
-          </div>
+          )}
 
           <button
             type="submit"
