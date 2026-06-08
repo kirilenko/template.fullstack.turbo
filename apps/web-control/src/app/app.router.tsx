@@ -9,6 +9,7 @@ import {
 import { paths } from '@/config'
 import { LoginPage, LogoutPage, RegisterPage, UnauthorizedPage } from '@/modules/auth'
 import { HomePage } from '@/modules/home'
+import { UsersPage } from '@/modules/users'
 
 import { Layout } from './layout'
 
@@ -83,6 +84,12 @@ const profileRoute = createRoute({
   path: paths.profile,
 })
 
+const usersRoute = createRoute({
+  component: UsersPage,
+  getParentRoute: () => adminRoute,
+  path: paths.users,
+})
+
 const logoutRoute = createRoute({
   component: LogoutPage,
   getParentRoute: () => privateRoute,
@@ -109,7 +116,7 @@ const unauthorizedRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
-    adminRoute.addChildren([homeRoute, profileRoute]),
+    adminRoute.addChildren([homeRoute, profileRoute, usersRoute]),
     privateRoute.addChildren([logoutRoute]),
     unauthorizedRoute,
   ]),

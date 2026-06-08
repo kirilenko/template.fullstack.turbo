@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 
-import { requireAdmin } from './middleware/auth.js'
+import { adminRoute } from './routes/admin.js'
 import { health } from './routes/health.js'
 import { usersRoute } from './routes/users.js'
 import { auth } from './auth.js'
@@ -37,11 +37,6 @@ const app = new Hono<{
   .on(['POST', 'GET'], '/api/auth/*', (c) => auth.handler(c.req.raw))
   .route('/', health)
   .route('/api/users', usersRoute)
-
-// Example admin-only route group — extend with your own routes
-const adminRoute = new Hono()
-  .use(requireAdmin)
-  .get('/stats', (c) => c.json({ message: 'Admin stats — implement me' }))
 
 app.route('/api/admin', adminRoute)
 

@@ -6,8 +6,8 @@ import { useAuth } from '@/services/auth'
 
 const NAV_ITEMS = [
   { label: 'Dashboard', to: paths.home },
+  { label: 'Пользователи', to: paths.users },
   { label: 'Профиль', to: paths.profile },
-  // Добавляй новые разделы сюда
 ]
 
 export function Layout(): JSX.Element {
