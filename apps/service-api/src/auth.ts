@@ -64,6 +64,9 @@ export const auth = betterAuth({
     ...(cookieDomain && {
       crossSubDomainCookies: { enabled: true, domain: cookieDomain },
     }),
+    // In dev ports can shift (Vite/Astro pick next free port), so disable
+    // CSRF origin check. In production trustedOrigins enforces strict matching.
+    ...(process.env.NODE_ENV !== 'production' && { disableCSRFCheck: true }),
   },
   trustedOrigins: appUrls,
   rateLimit: {
