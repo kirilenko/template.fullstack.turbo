@@ -75,6 +75,12 @@ packages/
 3. Add your project to `../../ports.yml` so `sync-ports.sh` picks up the right ports
 4. Run `pnpm dev` — it syncs ports, starts Docker, migrates, and launches all apps
 
+## Local Development Notes
+
+- **Email links in console**: SMTP не настроен → `mailer.ts` логирует ссылки (верификация, сброс пароля) в консоль `service-api` вместо отправки письма. Ищи строки `[mailer] →` в выводе API.
+- **CORS / CSRF в dev**: Vite и Astro могут сдвинуть порт если нужный занят. `service-api` разрешает любой `localhost:*` origin и отключает CSRF-проверку Better-Auth когда `NODE_ENV` ≠ `production`.
+- **Первый запуск**: `pnpm dev` делает `db:push --force` — схема применяется напрямую без миграций. Для продакшена: `pnpm db:generate` → закоммить `drizzle/` → `pnpm db:migrate`.
+
 ## Conventions
 
 - Commit format: `type(scope): message` (feat, fix, chore, docs, refactor, test)
