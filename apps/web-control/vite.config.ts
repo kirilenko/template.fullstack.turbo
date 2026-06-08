@@ -1,12 +1,18 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
 import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 function loadPortsLocal(): Record<string, string> {
-  const path = '../../.env.ports.local'
-  if (!existsSync(path)) return {}
+  const path = resolve(__dirname, '../../.env.ports.local')
+  if (!existsSync(path)) {
+    console.warn('[vite] .env.ports.local not found — run pnpm dev to sync ports')
+    return {}
+  }
   return Object.fromEntries(
     readFileSync(path, 'utf-8')
       .split('\n')

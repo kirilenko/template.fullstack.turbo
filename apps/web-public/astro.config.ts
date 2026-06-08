@@ -1,11 +1,18 @@
 import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import { existsSync, readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'astro/config'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 function loadPortsLocal(): Record<string, string> {
-  const path = '../../.env.ports.local'
-  if (!existsSync(path)) return {}
+  const path = resolve(__dirname, '../../.env.ports.local')
+  if (!existsSync(path)) {
+    console.warn('[astro] .env.ports.local not found — run pnpm dev to sync ports')
+    return {}
+  }
   return Object.fromEntries(
     readFileSync(path, 'utf-8')
       .split('\n')
