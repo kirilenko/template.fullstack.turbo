@@ -24,8 +24,7 @@ export function LoginPage() {
         return
       }
 
-      const session = await authClient.getSession()
-      if (session.data?.user?.role !== 'admin') {
+      if (result.data?.user?.role !== 'admin') {
         await authClient.signOut()
         setError('Этот аккаунт не является администратором. Обратитесь к владельцу системы.')
         setLoading(false)
