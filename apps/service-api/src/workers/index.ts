@@ -1,5 +1,5 @@
-import { tasksWorker } from './tasks.worker.js'
 import { closeQueues } from './queues.js'
+import { tasksWorker } from './tasks.worker.js'
 
 export async function startWorkers() {
   console.log('[workers] started')

@@ -25,6 +25,7 @@ packages/
 Astro + React islands. Доступен для всех зарегистрированных пользователей.
 
 **Страницы:**
+
 - `/` — лендинг
 - `/sign-in` — вход
 - `/register` — регистрация (с подтверждением email)
@@ -40,6 +41,7 @@ Auth-состояние в шапке (`HeaderAuth`) — React island, `client:l
 React SPA + TanStack Router. Доступ только для пользователей с `role = 'admin'`.
 
 **Страницы:**
+
 - `/login` — вход для администраторов
 - `/` — дашборд (только admin)
 - `/profile` — профиль администратора
@@ -111,6 +113,7 @@ pnpm build            # Build all packages
 See `README.md` for full setup instructions (ports, env, first run).
 
 Quick start:
+
 1. Add project entry to `ports.yml`, set `PORTS_FILE` in `.envrc` if needed
 2. Copy `.env.example` → `.env.local`, fill `BETTER_AUTH_SECRET` and `ADMIN_EMAILS`
 3. `pnpm dev`

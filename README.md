@@ -4,16 +4,17 @@ Fullstack monorepo template: Hono API + Astro (public site) + React (admin panel
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| API | Hono · Drizzle ORM · PostgreSQL · Better-Auth · BullMQ |
-| Public site | Astro · React islands · Tailwind v4 |
-| Admin panel | React · Vite · TanStack Router · Tailwind v4 |
-| Infra | pnpm workspaces · Turborepo · Docker · Dokploy |
+| Layer       | Tech                                                   |
+| ----------- | ------------------------------------------------------ |
+| API         | Hono · Drizzle ORM · PostgreSQL · Better-Auth · BullMQ |
+| Public site | Astro · React islands · Tailwind v4                    |
+| Admin panel | React · Vite · TanStack Router · Tailwind v4           |
+| Infra       | pnpm workspaces · Turborepo · Docker · Dokploy         |
 
 ## Apps
 
 ### web-public — public site + user cabinet
+
 Astro + React islands. Available to all registered users.
 
 - `/` — landing
@@ -23,6 +24,7 @@ Astro + React islands. Available to all registered users.
 - `/profile` — user cabinet (auth required)
 
 ### web-control — admin panel
+
 React SPA. Accessible only to users with `role = admin`.
 
 - `/login` — admin login
@@ -32,6 +34,7 @@ React SPA. Accessible only to users with `role = admin`.
 Admins are created automatically on registration if their email is listed in the `ADMIN_EMAILS` env variable. No registration form in the admin panel.
 
 ### service-api — REST API
+
 Hono + Drizzle + Better-Auth + BullMQ.
 
 Worker runs from the same Docker image as the API: `node dist/worker.js`.
@@ -123,6 +126,7 @@ Three environments map to branches: `main` → production, `stage` → staging, 
 Each has its own Dokploy compose in `dokploy/`.
 
 To enable auto-deploy via Dokploy webhook:
+
 1. Create compose apps in Dokploy for each environment
 2. Add webhook secrets to GitHub: `WEBHOOK_IMAGES_PULLING_URL_MAIN`, `_STAGE`, `_DEV`
 3. Uncomment the `trigger_deploy` job in `.github/workflows/ci.yml`
