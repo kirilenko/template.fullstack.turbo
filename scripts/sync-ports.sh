@@ -2,14 +2,21 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PORTS_FILE="$SCRIPT_DIR/../../../ports.yml"
 OUT_FILE="$SCRIPT_DIR/../.env.ports.local"
 
 # Replace with your project name as it appears in ports.yml
 PROJECT="template-fullstack-turbo"
 
+# Path to shared ports.yml — override via PORTS_FILE env variable.
+# Set it in .envrc: export PORTS_FILE=/path/to/your/ports.yml
+if [ -z "$PORTS_FILE" ]; then
+  PORTS_FILE="$SCRIPT_DIR/../../../ports.yml"
+fi
+
 if [ ! -f "$PORTS_FILE" ]; then
-  echo "Error: $PORTS_FILE not found" >&2
+  echo "Error: ports.yml not found at '$PORTS_FILE'" >&2
+  echo "  Set PORTS_FILE env variable pointing to your ports.yml, e.g.:" >&2
+  echo "  export PORTS_FILE=/path/to/ports.yml   (add to .envrc)" >&2
   exit 1
 fi
 

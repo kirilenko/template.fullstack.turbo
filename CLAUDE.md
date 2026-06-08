@@ -106,13 +106,37 @@ pnpm build            # Build all packages
 - Worker uses the same image as `service-api`, launched with `node dist/worker.js`
 - Auto-deploy via Dokploy webhook: uncomment `trigger_deploy` job in CI and add webhook secrets
 
+## Ports Setup
+
+Порты хранятся в общем файле `ports.yml` вне репозитория. Каждый проект регистрирует свой блок.
+
+**Пример `ports.yml`:**
+```yaml
+my-project:
+  api: 3006
+  web-control: 5184
+  web-public: 5185
+  postgres: 5438
+  redis: 6381
+```
+
+`scripts/sync-ports.sh` читает этот файл и генерирует `.env.ports.local` в корне проекта.
+`vite.config.ts` и `astro.config.ts` читают `.env.ports.local` напрямую — никаких хардкодов.
+
+**Где лежит `ports.yml`:**
+По умолчанию скрипт ищет файл на три уровня выше (`../../ports.yml` от корня проекта).
+Если структура папок другая — задай переменную `PORTS_FILE` в `.envrc`:
+```bash
+# .envrc
+export PORTS_FILE=/path/to/your/ports.yml
+```
+
 ## Environment Setup
 
-1. Copy `.env.example` → `.env` and `.env.local`
-2. Fill in `BETTER_AUTH_SECRET` (generate: `openssl rand -base64 32`)
-3. Set `ADMIN_EMAILS` to comma-separated list of admin emails
-4. Add your project to `../../ports.yml` so `sync-ports.sh` picks up the right ports
-5. Run `pnpm dev` — it syncs ports, starts Docker, pushes schema, and launches all apps
+1. Создай запись для проекта в `ports.yml` (см. раздел "Ports Setup" выше)
+2. Если `ports.yml` не на `../../`, добавь `export PORTS_FILE=...` в `.envrc`
+3. Скопируй `.env.example` → `.env.local`, заполни `BETTER_AUTH_SECRET` и `ADMIN_EMAILS`
+4. Запусти `pnpm dev` — синхронизирует порты, поднимает Docker, накатывает схему, стартует все приложения
 
 ## Local Development Notes
 
