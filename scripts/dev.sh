@@ -12,6 +12,26 @@ for f in .env .env.local .env.ports.local; do
   [ -f "$f" ] && cat "$f" >> .env.build.local || true
 done
 
+# Kill any stray processes on the required ports (leftover from previous dev sessions)
+kill_port() {
+  local port="$1"
+  local pid
+  pid=$(lsof -ti :"$port" 2>/dev/null) || true
+  if [ -n "$pid" ]; then
+    echo "Killing stray process on port $port (pid $pid)..."
+    kill "$pid" 2>/dev/null || true
+    sleep 1
+  fi
+}
+
+get_port() {
+  grep "^$1=" .env.ports.local 2>/dev/null | cut -d= -f2
+}
+
+kill_port "$(get_port PORT)"
+kill_port "$(get_port PORT_VITE_CONTROL)"
+kill_port "$(get_port PORT_ASTRO_PUBLIC)"
+
 # Start Docker services
 echo "Starting Docker services..."
 docker compose --env-file .env.build.local up -d
