@@ -2,10 +2,10 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 
-import { auth } from './auth.js'
 import { requireAdmin } from './middleware/auth.js'
 import { health } from './routes/health.js'
 import { usersRoute } from './routes/users.js'
+import { auth } from './auth.js'
 
 const app = new Hono<{
   Variables: {
@@ -17,7 +17,14 @@ const app = new Hono<{
   .use(
     '*',
     cors({
-      origin: (process.env.PUBLIC_APP_URL ?? '').split(',').map((u) => u.trim()).filter(Boolean),
+      origin: (origin) => {
+        // In dev allow any localhost origin (ports can shift between runs)
+        if (process.env.NODE_ENV !== 'production' && /^https?:\/\/localhost(:\d+)?$/.test(origin ?? '')) {
+          return origin
+        }
+        const allowed = (process.env.PUBLIC_APP_URL ?? '').split(',').map((u) => u.trim()).filter(Boolean)
+        return allowed.find((u) => u === origin) ?? null
+      },
       credentials: true,
     }),
   )
