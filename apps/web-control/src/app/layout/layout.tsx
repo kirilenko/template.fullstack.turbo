@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { ThemeSwitcher } from '@packages/lib/theme'
+import { useRenderLog } from 'react-render-log'
 
 import { paths } from '@/config'
 import { useAuth } from '@/services/auth'
@@ -12,6 +13,7 @@ const NAV_ITEMS = [
 ]
 
 export function Layout(): JSX.Element {
+  useRenderLog()('Layout')()
   const { user } = useAuth()
   const location = useLocation()
 

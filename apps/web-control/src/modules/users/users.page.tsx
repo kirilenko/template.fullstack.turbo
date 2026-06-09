@@ -1,11 +1,13 @@
 import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { useAuth } from '@/services/auth'
 
 import { type User,usersApi } from './users.api'
 
 export function UsersPage(): JSX.Element {
+  useRenderLog()('UsersPage')()
   const { user: currentUser } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)

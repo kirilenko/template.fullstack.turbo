@@ -1,8 +1,10 @@
 import type { JSX } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { useAuth } from '@/services/auth'
 
 export function HomePage(): JSX.Element {
+  useRenderLog()('HomePage')()
   const { user } = useAuth()
 
   return (

@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { paths } from '@/config'
 import { authClient } from '@/services/auth'
 
 export function LoginPage() {
+  useRenderLog()('LoginPage')()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -108,6 +110,7 @@ export function LoginPage() {
 }
 
 export function LogoutPage() {
+  useRenderLog()('LogoutPage')()
   const handleLogout = async () => {
     await authClient.signOut()
     window.location.href = '/login'
@@ -138,6 +141,7 @@ export function LogoutPage() {
 }
 
 export function UnauthorizedPage() {
+  useRenderLog()('UnauthorizedPage')()
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="space-y-4 text-center">
@@ -155,6 +159,7 @@ export function UnauthorizedPage() {
 }
 
 export function RegisterPage() {
+  useRenderLog()('RegisterPage')()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
