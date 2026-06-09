@@ -1,36 +1,21 @@
 import type { JSX } from 'react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
 import { useAuth } from '@/services/auth'
-
-import { type User, usersApi } from '@/services/users'
+import { type User, useUsersReading, useUsersWriting } from '@/services/users'
 
 export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
   const { user: currentUser } = useAuth()
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { users, setUsers, isLoading, error: readError } = useUsersReading()
+  const { saving, deletingId, setDeletingId, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
+
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [editName, setEditName] = useState('')
   const [editRole, setEditRole] = useState('')
-  const [saving, setSaving] = useState(false)
 
-  const load = async () => {
-    try {
-      setLoading(true)
-      setError('')
-      setUsers(await usersApi.list())
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => { void load() }, [])
+  const error = readError || writeError
 
   const openEdit = (user: User) => {
     setEditingUser(user)
@@ -40,27 +25,12 @@ export function UsersPage(): JSX.Element {
 
   const handleSave = async () => {
     if (!editingUser) return
-    setSaving(true)
-    try {
-      const updated = await usersApi.update(editingUser.id, { name: editName, role: editRole })
-      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)))
-      setEditingUser(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка сохранения')
-    } finally {
-      setSaving(false)
-    }
+    const ok = await updateUser(editingUser.id, { name: editName, role: editRole })
+    if (ok) setEditingUser(null)
   }
 
   const handleDelete = async (id: string) => {
-    try {
-      await usersApi.delete(id)
-      setUsers((prev) => prev.filter((u) => u.id !== id))
-      setDeletingId(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка удаления')
-      setDeletingId(null)
-    }
+    await deleteUser(id)
   }
 
   return (
@@ -72,7 +42,7 @@ export function UsersPage(): JSX.Element {
       )}
 
       <div className="mt-6 overflow-hidden rounded-xl border bg-card">
-        {loading ? (
+        {isLoading ? (
           <div className="p-8 text-center text-sm text-muted-foreground">Загрузка...</div>
         ) : (
           <table className="w-full text-sm">
