@@ -2,12 +2,12 @@ import type { JSX } from 'react'
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
-import { useAuth } from '@/services/auth'
+import { useAuthReading } from '@/services/auth'
 import { type User, useUsersReading, useUsersWriting } from '@/services/users'
 
 export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
-  const { user: currentUser } = useAuth()
+  const { user: currentUser } = useAuthReading()
   const { users, setUsers, isLoading, error: readError } = useUsersReading()
   const { saving, deletingId, setDeletingId, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
 

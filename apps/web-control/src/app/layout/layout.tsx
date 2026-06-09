@@ -4,7 +4,7 @@ import { ThemeSwitcher } from '@packages/lib/theme'
 import { useRenderLog } from 'react-render-log'
 
 import { paths } from '@/config'
-import { useAuth } from '@/services/auth'
+import { useAuthReading } from '@/services/auth'
 
 const NAV_ITEMS = [
   { label: 'Dashboard', to: paths.home },
@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 
 export function Layout(): JSX.Element {
   useRenderLog()('Layout')()
-  const { user } = useAuth()
+  const { user } = useAuthReading()
   const location = useLocation()
 
   return (

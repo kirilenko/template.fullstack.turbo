@@ -1,3 +1,5 @@
 export { authClient } from './auth.client'
-export { AuthProvider, useAuth } from './auth.provider'
+export { AuthProvider } from './auth.provider'
+export { useAuthReading } from './use.auth.reading'
+export { useAuthWriting } from './use.auth.writing'
 export type { AuthRole, AuthState } from './auth.schema'
