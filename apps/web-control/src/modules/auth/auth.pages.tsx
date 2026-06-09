@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
 import { paths } from '@/config'
-import { authClient } from '@/services/auth'
+import { useAuthWriting } from '@/services/auth'
 
 export function LoginPage() {
   useRenderLog()('LoginPage')()
+  const { signIn, signOut } = useAuthWriting()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -20,7 +21,7 @@ export function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await authClient.signIn.email({ email, password })
+      const result = await signIn({ email, password })
       if (result.error) {
         setError(result.error.message ?? 'Ошибка входа')
         setLoading(false)
@@ -30,7 +31,7 @@ export function LoginPage() {
       if (result.data?.user?.role !== 'admin') {
         setError('Этот аккаунт не является администратором. Обратитесь к владельцу системы.')
         setLoading(false)
-        void authClient.signOut()
+        void signOut()
         return
       }
 
@@ -111,8 +112,9 @@ export function LoginPage() {
 
 export function LogoutPage() {
   useRenderLog()('LogoutPage')()
+  const { signOut } = useAuthWriting()
   const handleLogout = async () => {
-    await authClient.signOut()
+    await signOut()
     window.location.href = '/login'
   }
 
@@ -160,6 +162,7 @@ export function UnauthorizedPage() {
 
 export function RegisterPage() {
   useRenderLog()('RegisterPage')()
+  const { signUp } = useAuthWriting()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -180,7 +183,7 @@ export function RegisterPage() {
     setError('')
     setLoading(true)
 
-    const result = await authClient.signUp.email({
+    const result = await signUp({
       email,
       password,
       name: name.trim(),
