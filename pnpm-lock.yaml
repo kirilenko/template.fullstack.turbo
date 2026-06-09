@@ -86,6 +86,9 @@ importers:
       '@apps/service-api':
         specifier: workspace:*
         version: link:../service-api
+      '@packages/lib':
+        specifier: workspace:*
+        version: link:../../packages/lib
       '@packages/ui':
         specifier: workspace:*
         version: link:../../packages/ui

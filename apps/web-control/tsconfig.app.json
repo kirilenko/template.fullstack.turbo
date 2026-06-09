@@ -17,7 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "erasableSyntaxOnly": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@packages/lib/*": ["../../packages/lib/src/*/index.ts"]
     }
   },
   "include": ["src"]

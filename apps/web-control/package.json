@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@apps/service-api": "workspace:*",
+    "@packages/lib": "workspace:*",
     "@packages/ui": "workspace:*",
     "@tanstack/react-router": "^1.170.7",
     "better-auth": "^1.6.10",
