@@ -1,9 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RenderLogProvider } from 'react-render-log'
+import { scan } from 'react-scan'
 
 import { App } from '@/app'
 import { env } from '@/config'
+
+scan({ enabled: env.PUBLIC_REACT_SCAN as boolean })
 
 import './index.css'
 

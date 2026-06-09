@@ -11,6 +11,7 @@
         "ADMIN_EMAILS",
         "PUBLIC_API_URL",
         "PUBLIC_APP_URL",
+        "PUBLIC_REACT_SCAN",
         "PUBLIC_RENDER_LOG",
         "PUBLIC_TIMESTAMP",
         "DATABASE_URL",
@@ -43,7 +44,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "env": ["PUBLIC_API_URL", "PUBLIC_RENDER_LOG", "PUBLIC_TIMESTAMP", "DATABASE_URL", "SITE_URL"],
+      "env": ["PUBLIC_API_URL", "PUBLIC_REACT_SCAN", "PUBLIC_RENDER_LOG", "PUBLIC_TIMESTAMP", "DATABASE_URL", "SITE_URL"],
       "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
       "outputs": ["dist/**", ".astro/**"]
     },
