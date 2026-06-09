@@ -1,14 +1,7 @@
 import { type FC } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@packages/ui'
+import { Select, SelectOption } from '@packages/ui'
 
 import { useLanguage } from './i18n.provider'
 import type { Language } from './i18n.types'
@@ -34,20 +27,11 @@ const LanguageSwitcher: FC<Props> = ({ languages, languageLabels }) => {
 
   return (
     <Select value={language} onValueChange={handleLanguageChange}>
-      <SelectTrigger>
-        <SelectValue aria-label={language}>
-          {languageLabels[language] ?? language}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {languages.map((lang) => (
-            <SelectItem key={lang} value={lang}>
-              {languageLabels[lang] ?? lang}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
+      {languages.map((lang) => (
+        <SelectOption key={lang} value={lang}>
+          {languageLabels[lang] ?? lang}
+        </SelectOption>
+      ))}
     </Select>
   )
 }
