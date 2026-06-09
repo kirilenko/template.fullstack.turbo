@@ -1,6 +1,10 @@
-import { authClient } from '@/services/auth/auth.client'
+import { useRenderLog } from 'react-render-log'
 
-export default function GetStartedButton() {
+import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
+
+function GetStartedButtonInner() {
+  useRenderLog()('GetStartedButton')()
   const { data: session, isPending } = authClient.useSession()
 
   if (isPending) {
@@ -20,4 +24,8 @@ export default function GetStartedButton() {
       {label}
     </a>
   )
+}
+
+export default function GetStartedButton() {
+  return <RenderLogIslandProvider><GetStartedButtonInner /></RenderLogIslandProvider>
 }

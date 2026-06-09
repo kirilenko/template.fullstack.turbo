@@ -1,6 +1,10 @@
-import { authClient } from '@/services/auth/auth.client'
+import { useRenderLog } from 'react-render-log'
 
-export default function HeaderAuth() {
+import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
+
+function HeaderAuthInner() {
+  useRenderLog()('HeaderAuth')()
   const { data: session, isPending } = authClient.useSession()
 
   if (isPending) return <div className="h-8 w-20 animate-pulse rounded bg-muted" />
@@ -28,4 +32,8 @@ export default function HeaderAuth() {
       </a>
     </div>
   )
+}
+
+export default function HeaderAuth() {
+  return <RenderLogIslandProvider><HeaderAuthInner /></RenderLogIslandProvider>
 }

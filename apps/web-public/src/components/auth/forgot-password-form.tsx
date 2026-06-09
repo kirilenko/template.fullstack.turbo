@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 
-export default function ForgotPasswordForm() {
+function ForgotPasswordFormInner() {
+  useRenderLog()('ForgotPasswordForm')()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -69,4 +72,8 @@ export default function ForgotPasswordForm() {
       </div>
     </div>
   )
+}
+
+export default function ForgotPasswordForm() {
+  return <RenderLogIslandProvider><ForgotPasswordFormInner /></RenderLogIslandProvider>
 }

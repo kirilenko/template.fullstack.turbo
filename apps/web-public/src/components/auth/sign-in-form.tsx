@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 
-export default function SignInForm() {
+function SignInFormInner() {
+  useRenderLog()('SignInForm')()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -95,6 +98,10 @@ export default function SignInForm() {
       </div>
     </div>
   )
+}
+
+export default function SignInForm() {
+  return <RenderLogIslandProvider><SignInFormInner /></RenderLogIslandProvider>
 }
 
 function EyeIcon() {

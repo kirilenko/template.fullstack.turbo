@@ -1,15 +1,17 @@
 import { useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 
-export default function ResetPasswordForm() {
+function ResetPasswordFormInner() {
+  useRenderLog()('ResetPasswordForm')()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  // Use lazy initializer to safely access window (Astro may SSR this component)
   const [token] = useState(() =>
     typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('token') : null
   )
@@ -102,4 +104,8 @@ export default function ResetPasswordForm() {
       </div>
     </div>
   )
+}
+
+export default function ResetPasswordForm() {
+  return <RenderLogIslandProvider><ResetPasswordFormInner /></RenderLogIslandProvider>
 }

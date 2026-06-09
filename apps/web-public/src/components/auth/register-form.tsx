@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 
-export default function RegisterForm() {
+function RegisterFormInner() {
+  useRenderLog()('RegisterForm')()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -128,4 +131,8 @@ export default function RegisterForm() {
       </div>
     </div>
   )
+}
+
+export default function RegisterForm() {
+  return <RenderLogIslandProvider><RegisterFormInner /></RenderLogIslandProvider>
 }

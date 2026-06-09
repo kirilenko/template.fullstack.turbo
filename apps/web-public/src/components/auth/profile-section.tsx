@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { authClient } from '@/services/auth/auth.client'
+import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 
-export default function ProfileSection() {
+function ProfileSectionInner() {
+  useRenderLog()('ProfileSection')()
   const { data: session, isPending } = authClient.useSession()
 
   useEffect(() => {
@@ -54,4 +57,8 @@ export default function ProfileSection() {
       </div>
     </div>
   )
+}
+
+export default function ProfileSection() {
+  return <RenderLogIslandProvider><ProfileSectionInner /></RenderLogIslandProvider>
 }
