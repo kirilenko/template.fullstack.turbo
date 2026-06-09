@@ -16,6 +16,7 @@
     "@packages/ui": "workspace:*",
     "@tanstack/react-router": "^1.170.7",
     "better-auth": "^1.6.10",
+    "lucide-react": "^1.17.0",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },

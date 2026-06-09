@@ -25,8 +25,8 @@ export function UsersPage(): JSX.Element {
     setEditing({ user, name: user.name, role: user.role ?? 'user' }), [])
 
   const handleDelete = useCallback(async (id: string) => {
-    const ok = await deleteUser(id)
-    if (ok) setDeletingId(null)
+    await deleteUser(id)
+    setDeletingId(null)
   }, [deleteUser])
 
   const handleSave = async () => {
@@ -74,6 +74,7 @@ export function UsersPage(): JSX.Element {
                   isCurrentUser={user.id === currentUser?.id}
                   isBeingDeleted={deletingId === user.id}
                   isDeleting={deletingId === user.id ? deleting : false}
+                  isAnyDeleting={deleting}
                   onEdit={openEdit}
                   onDelete={handleDelete}
                   onSetDeletingId={setDeletingId}

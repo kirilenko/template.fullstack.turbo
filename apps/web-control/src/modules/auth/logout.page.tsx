@@ -24,7 +24,7 @@ export function LogoutPage() {
             Отмена
           </a>
           <button
-            onClick={handleLogout}
+            onClick={() => { void handleLogout() }}
             className="inline-flex h-10 items-center rounded-md bg-destructive px-6 text-sm font-medium text-white transition-colors hover:bg-destructive/90"
           >
             Выйти

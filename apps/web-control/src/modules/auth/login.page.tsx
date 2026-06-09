@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { Eye, EyeOff } from 'lucide-react'
 import { useRenderLog } from 'react-render-log'
 
 import { Input } from '@packages/ui'
 import { paths } from '@/config'
 import { useAuthWriting } from '@/services/auth'
-
-import { EyeIcon, EyeOffIcon } from './eye-icons'
 
 export function LoginPage() {
   useRenderLog()('LoginPage')()
@@ -35,7 +34,7 @@ export function LoginPage() {
       if ((result.data?.user as { role?: string } | null)?.role !== 'admin') {
         setError('Этот аккаунт не является администратором. Обратитесь к владельцу системы.')
         setLoading(false)
-        void signOut()
+        await signOut()
         return
       }
 
@@ -74,21 +73,21 @@ export function LoginPage() {
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">Пароль</label>
             <div className="relative">
-              <input
+              <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="pr-10"
                 autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+                className="absolute right-0 top-0 inline-flex h-9 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
               >
-                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
           </div>

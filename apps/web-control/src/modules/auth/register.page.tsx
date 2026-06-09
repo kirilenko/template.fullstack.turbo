@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { Eye, EyeOff } from 'lucide-react'
 import { useRenderLog } from 'react-render-log'
 
 import { Input } from '@packages/ui'
 import { paths } from '@/config'
 import { useAuthWriting } from '@/services/auth'
-
-import { EyeIcon, EyeOffIcon } from './eye-icons'
 
 export function RegisterPage() {
   useRenderLog()('RegisterPage')()
@@ -89,47 +88,33 @@ export function RegisterPage() {
 
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">Имя</label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              autoComplete="name"
-            />
+            <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="reg-email" className="text-sm font-medium">Email</label>
-            <Input
-              id="reg-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
+            <Input id="reg-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="reg-password" className="text-sm font-medium">Пароль</label>
             <div className="relative">
-              <input
+              <Input
                 id="reg-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="pr-10"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+                className="absolute right-0 top-0 inline-flex h-9 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
               >
-                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
           </div>
@@ -137,14 +122,13 @@ export function RegisterPage() {
           {!showPassword && (
             <div className="space-y-2">
               <label htmlFor="confirm-password" className="text-sm font-medium">Подтверждение пароля</label>
-              <input
+              <Input
                 id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={8}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 autoComplete="new-password"
               />
             </div>

@@ -9,25 +9,28 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   const { data: session, isPending } = authClient.useSession()
 
   const signOut = useCallback(async () => {
-    await authClient.signOut()
-    window.location.href = '/login'
+    try {
+      await authClient.signOut()
+    } catch {
+      // session may already be expired
+    }
   }, [])
 
-  // Stabilize user reference by identity — better-auth may return a new object on each poll
   const userId = session?.user?.id ?? null
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const user = useMemo(() => session?.user ?? null, [userId])
-  const role = (user?.role ?? null) as AuthRole | null
+  const sessionRole = ((session?.user as { role?: string } | null)?.role ?? null) as AuthRole | null
+
+  // Stabilize by both id and role so a server-side role change is picked up
+  const user = useMemo(() => session?.user ?? null, [userId, sessionRole]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const value = useMemo(
     () => ({
       isAuthenticated: !!user,
       isLoaded: !isPending,
-      role,
+      role: sessionRole,
       signOut,
       user,
     }),
-    [user, isPending, role, signOut],
+    [user, isPending, sessionRole, signOut],
   )
 
   return <AuthContext value={value}>{children}</AuthContext>

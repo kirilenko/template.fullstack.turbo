@@ -8,6 +8,7 @@ export type UserRowProps = PropsWithRenderLog<{
   isCurrentUser: boolean
   isBeingDeleted: boolean
   isDeleting: boolean
+  isAnyDeleting: boolean
   onEdit: (user: User) => void
   onDelete: (id: string) => void
   onSetDeletingId: (id: string | null) => void
@@ -18,6 +19,7 @@ function UserRowBase({
   isCurrentUser,
   isBeingDeleted,
   isDeleting,
+  isAnyDeleting,
   onEdit,
   onDelete,
   onSetDeletingId,
@@ -75,7 +77,8 @@ function UserRowBase({
               {!isCurrentUser && (
                 <button
                   onClick={() => onSetDeletingId(user.id)}
-                  className="text-xs font-medium text-destructive hover:underline"
+                  disabled={isAnyDeleting}
+                  className="text-xs font-medium text-destructive hover:underline disabled:opacity-50"
                 >
                   Удалить
                 </button>

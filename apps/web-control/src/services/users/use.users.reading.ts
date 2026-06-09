@@ -15,17 +15,20 @@ export function useUsersReading(): {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    const controller = new AbortController()
     setIsLoading(true)
     setError('')
-    apiFetch<User[]>('/api/admin/users')
+    apiFetch<User[]>('/api/admin/users', { signal: controller.signal })
       .then((data) => {
         setUsers(data)
         setIsLoading(false)
       })
       .catch((err) => {
+        if (err instanceof Error && err.name === 'AbortError') return
         setError(err instanceof Error ? err.message : 'Ошибка загрузки')
         setIsLoading(false)
       })
+    return () => controller.abort()
   }, [])
 
   return { users, setUsers, isLoading, error }
