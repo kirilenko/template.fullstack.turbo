@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useRenderLog } from 'react-render-log'
 
+import { Input } from '@packages/ui'
 import { paths } from '@/config'
 import { useAuthWriting } from '@/services/auth'
 
@@ -28,7 +30,7 @@ export function LoginPage() {
         return
       }
 
-      if (result.data?.user?.role !== 'admin') {
+      if ((result.data?.user as { role?: string } | null)?.role !== 'admin') {
         setError('Этот аккаунт не является администратором. Обратитесь к владельцу системы.')
         setLoading(false)
         void signOut()
@@ -57,13 +59,12 @@ export function LoginPage() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">Email</label>
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               autoComplete="email"
             />
           </div>
@@ -101,9 +102,9 @@ export function LoginPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Нет аккаунта?{' '}
-          <a href={paths.register} className="text-foreground underline underline-offset-4 hover:text-primary">
+          <Link to={paths.register} className="text-foreground underline underline-offset-4 hover:text-primary">
             Зарегистрироваться
-          </a>
+          </Link>
         </p>
       </div>
     </div>
@@ -183,20 +184,25 @@ export function RegisterPage() {
     setError('')
     setLoading(true)
 
-    const result = await signUp({
-      email,
-      password,
-      name: name.trim(),
-      callbackURL: window.location.origin + '/',
-    })
+    try {
+      const result = await signUp({
+        email,
+        password,
+        name: name.trim(),
+        callbackURL: window.location.origin + '/',
+      })
 
-    if (result.error) {
-      setError(result.error.message ?? 'Ошибка регистрации')
+      if (result.error) {
+        setError(result.error.message ?? 'Ошибка регистрации')
+        setLoading(false)
+        return
+      }
+
+      setDone(true)
+    } catch {
+      setError('Ошибка регистрации')
       setLoading(false)
-      return
     }
-
-    setDone(true)
   }
 
   if (done) {
@@ -236,26 +242,24 @@ export function RegisterPage() {
 
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">Имя</label>
-            <input
+            <Input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               autoComplete="name"
             />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="reg-email" className="text-sm font-medium">Email</label>
-            <input
+            <Input
               id="reg-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               autoComplete="email"
             />
           </div>
@@ -310,9 +314,9 @@ export function RegisterPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Уже есть аккаунт?{' '}
-          <a href={paths.login} className="text-foreground underline underline-offset-4 hover:text-primary">
+          <Link to={paths.login} className="text-foreground underline underline-offset-4 hover:text-primary">
             Войти
-          </a>
+          </Link>
         </p>
       </div>
     </div>

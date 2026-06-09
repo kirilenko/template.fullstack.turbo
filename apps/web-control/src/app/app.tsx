@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { RouterProvider } from '@tanstack/react-router'
 import { ThemeProvider } from '@packages/lib/theme'
 
@@ -9,14 +9,17 @@ import { router } from './app.router'
 
 function AppRouter(): JSX.Element {
   const { isAuthenticated, isLoaded, role } = useAuthReading()
-  const hasLoaded = useRef(false)
-  if (isLoaded) hasLoaded.current = true
+  const [hasLoaded, setHasLoaded] = useState(false)
+
+  useEffect(() => {
+    if (isLoaded) setHasLoaded(true)
+  }, [isLoaded])
 
   useEffect(() => {
     if (isLoaded) void router.invalidate()
   }, [isAuthenticated, isLoaded, role])
 
-  if (!hasLoaded.current) return <></>
+  if (!hasLoaded) return <></>
 
   return (
     <RouterProvider

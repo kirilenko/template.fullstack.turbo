@@ -60,7 +60,7 @@ const privateRoute = createRoute({
 // Redirects authenticated admins away to home
 const publicOnlyRoute = createRoute({
   beforeLoad: ({ context }) => {
-    if (context.isAuthenticated && context.isAdmin) {
+    if (context.isAuthenticated) {
       throw redirect({ to: paths.home })
     }
   },

@@ -2,35 +2,35 @@ import type { JSX } from 'react'
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
+import { Input } from '@packages/ui'
 import { useAuthReading } from '@/services/auth'
 import { type User, useUsersReading, useUsersWriting } from '@/services/users'
+
+type EditingState = { user: User; name: string; role: string }
 
 export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
   const { user: currentUser } = useAuthReading()
   const { users, setUsers, isLoading, error: readError } = useUsersReading()
-  const { saving, deletingId, setDeletingId, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
+  const { saving, deleting, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
 
-  const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [editName, setEditName] = useState('')
-  const [editRole, setEditRole] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editing, setEditing] = useState<EditingState | null>(null)
 
   const error = readError || writeError
 
-  const openEdit = (user: User) => {
-    setEditingUser(user)
-    setEditName(user.name)
-    setEditRole(user.role ?? 'user')
-  }
+  const openEdit = (user: User) =>
+    setEditing({ user, name: user.name, role: user.role ?? 'user' })
 
   const handleSave = async () => {
-    if (!editingUser) return
-    const ok = await updateUser(editingUser.id, { name: editName, role: editRole })
-    if (ok) setEditingUser(null)
+    if (!editing) return
+    const ok = await updateUser(editing.user.id, { name: editing.name, role: editing.role })
+    if (ok) setEditing(null)
   }
 
   const handleDelete = async (id: string) => {
-    await deleteUser(id)
+    const ok = await deleteUser(id)
+    if (ok) setDeletingId(null)
   }
 
   return (
@@ -93,13 +93,15 @@ export function UsersPage(): JSX.Element {
                           <span className="text-xs text-muted-foreground">Удалить?</span>
                           <button
                             onClick={() => { void handleDelete(user.id) }}
-                            className="text-xs font-medium text-destructive hover:underline"
+                            disabled={deleting}
+                            className="text-xs font-medium text-destructive hover:underline disabled:opacity-50"
                           >
                             Да
                           </button>
                           <button
                             onClick={() => setDeletingId(null)}
-                            className="text-xs text-muted-foreground hover:underline"
+                            disabled={deleting}
+                            className="text-xs text-muted-foreground hover:underline disabled:opacity-50"
                           >
                             Отмена
                           </button>
@@ -131,28 +133,27 @@ export function UsersPage(): JSX.Element {
         )}
       </div>
 
-      {editingUser && (
+      {editing && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={(e) => { if (e.target === e.currentTarget) setEditingUser(null) }}
+          onClick={(e) => { if (e.target === e.currentTarget) setEditing(null) }}
         >
           <div className="w-full max-w-sm rounded-xl border bg-card p-6 shadow-xl">
             <h2 className="text-lg font-semibold">Редактировать пользователя</h2>
             <div className="mt-4 space-y-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Имя</label>
-                <input
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                <Input
+                  value={editing.name}
+                  onChange={(e) => setEditing((prev) => prev && { ...prev, name: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Роль</label>
                 <select
-                  value={editRole}
-                  onChange={(e) => setEditRole(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={editing.role}
+                  onChange={(e) => setEditing((prev) => prev && { ...prev, role: e.target.value })}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 >
                   <option value="user">user</option>
                   <option value="admin">admin</option>
@@ -161,7 +162,7 @@ export function UsersPage(): JSX.Element {
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
-                onClick={() => setEditingUser(null)}
+                onClick={() => setEditing(null)}
                 disabled={saving}
                 className="inline-flex h-9 items-center rounded-md border px-4 text-sm font-medium transition-colors hover:bg-accent disabled:opacity-50"
               >
@@ -169,7 +170,7 @@ export function UsersPage(): JSX.Element {
               </button>
               <button
                 onClick={() => { void handleSave() }}
-                disabled={saving || !editName.trim()}
+                disabled={saving || !editing.name.trim()}
                 className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
               >
                 {saving ? 'Сохранение...' : 'Сохранить'}

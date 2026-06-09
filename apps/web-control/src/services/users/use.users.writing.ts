@@ -6,14 +6,13 @@ import type { User } from './users.schema'
 
 export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<User[]>>): {
   saving: boolean
-  deletingId: string | null
-  setDeletingId: (id: string | null) => void
+  deleting: boolean
   error: string
   updateUser: (id: string, data: { name?: string; role?: string }) => Promise<boolean>
   deleteUser: (id: string) => Promise<boolean>
 } {
   const [saving, setSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
 
   const updateUser = async (id: string, data: { name?: string; role?: string }) => {
@@ -35,18 +34,20 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
   }
 
   const deleteUser = async (id: string) => {
+    if (deleting) return false
+    setDeleting(true)
     setError('')
     try {
       await apiFetch<{ success: boolean }>(`/api/admin/users/${id}`, { method: 'DELETE' })
       setUsers((prev) => prev.filter((u) => u.id !== id))
-      setDeletingId(null)
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка удаления')
-      setDeletingId(null)
       return false
+    } finally {
+      setDeleting(false)
     }
   }
 
-  return { saving, deletingId, setDeletingId, error, updateUser, deleteUser }
+  return { saving, deleting, error, updateUser, deleteUser }
 }
