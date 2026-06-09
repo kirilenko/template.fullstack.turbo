@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
+import { ThemeSwitcher } from '@packages/lib/theme'
 
 import { paths } from '@/config'
 import { useAuth } from '@/services/auth'
@@ -45,6 +46,7 @@ export function Layout(): JSX.Element {
         <header className="flex h-14 shrink-0 items-center justify-between border-b px-6">
           <div />
           <div className="flex items-center gap-3">
+            <ThemeSwitcher />
             <span className="text-sm text-muted-foreground">{user?.email}</span>
             <Link
               to={paths.logout}

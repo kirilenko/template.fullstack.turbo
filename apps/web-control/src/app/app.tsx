@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { useEffect, useRef } from 'react'
 import { RouterProvider } from '@tanstack/react-router'
+import { ThemeProvider } from '@packages/lib/theme'
 
 import { AuthProvider, useAuth } from '@/services/auth'
 
@@ -27,8 +28,10 @@ function AppRouter(): JSX.Element {
 
 export function App(): JSX.Element {
   return (
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
