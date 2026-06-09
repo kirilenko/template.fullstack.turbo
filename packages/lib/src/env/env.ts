@@ -7,9 +7,7 @@ type EnvConfig<Keys extends string> = Record<Keys, EnvConfigItemValue>
 
 type EnvValue = string | number | boolean | null
 
-const parseEnv = <Keys extends string>(
-  envConfig: EnvConfig<Keys>,
-): Record<string, EnvValue> =>
+const parseEnv = <Keys extends string>(envConfig: EnvConfig<Keys>): Record<Keys, EnvValue> =>
   (Object.entries(envConfig) as [Keys, EnvConfigItemValue][]).reduce(
     (acc, [key, { required, type = 'string' }]) => {
       const value = import.meta.env[key]
@@ -23,7 +21,7 @@ const parseEnv = <Keys extends string>(
           break
 
         case 'number':
-          acc[key] = Number.isNaN(+value) ? null : value
+          acc[key] = Number.isNaN(+value) ? null : +value
           break
 
         case 'protocol':
@@ -31,7 +29,7 @@ const parseEnv = <Keys extends string>(
             if (!['http', 'https'].includes(value ?? ''))
               throw new Error(`${value} should be http or https`)
 
-            return value  
+            return value
           })()
           break
 
@@ -43,7 +41,7 @@ const parseEnv = <Keys extends string>(
           acc[key] = (() => {
             try {
               new URL(value ?? '')
-              return value  
+              return value
             } catch {
               throw new Error(`Invalid URL: ${value}`)
             }
@@ -56,7 +54,7 @@ const parseEnv = <Keys extends string>(
 
       return acc
     },
-    {} as Record<string, EnvValue>,
+    {} as Record<Keys, EnvValue>,
   )
 
 export type { EnvConfigItemValue, EnvConfig, EnvValue }
