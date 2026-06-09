@@ -42,3 +42,6 @@ redis-data/
 
 # Backup
 backup.sql
+
+# Claude Code auto-memory
+memory/
