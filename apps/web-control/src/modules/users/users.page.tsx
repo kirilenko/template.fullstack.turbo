@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 import { memo, useCallback, useState } from 'react'
-import { useRenderLog } from 'react-render-log'
+import { type PropsWithRenderLog, useRenderLog, withRenderLog } from 'react-render-log'
 
 import { Input } from '@packages/ui'
 import { useAuthReading } from '@/services/auth'
@@ -8,7 +8,7 @@ import { type User, useUsersReading, useUsersWriting } from '@/services/users'
 
 type EditingState = { user: User; name: string; role: string }
 
-type UserRowProps = {
+type UserRowProps = PropsWithRenderLog<{
   user: User
   isCurrentUser: boolean
   isBeingDeleted: boolean
@@ -16,9 +16,9 @@ type UserRowProps = {
   onEdit: (user: User) => void
   onDelete: (id: string) => void
   onSetDeletingId: (id: string | null) => void
-}
+}>
 
-const UserRow = memo(function UserRow({
+const UserRow = withRenderLog(memo(function UserRow({
   user,
   isCurrentUser,
   isBeingDeleted,
@@ -91,7 +91,7 @@ const UserRow = memo(function UserRow({
       </td>
     </tr>
   )
-})
+}))
 
 export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
@@ -152,6 +152,7 @@ export function UsersPage(): JSX.Element {
               {users.map((user) => (
                 <UserRow
                   key={user.id}
+                  renderLogId={user.id}
                   user={user}
                   isCurrentUser={user.id === currentUser?.id}
                   isBeingDeleted={deletingId === user.id}
