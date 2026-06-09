@@ -13,7 +13,7 @@ function getTransporter(): Transporter | undefined {
   if (transporter) return transporter
 
   const host = process.env.SMTP_HOST
-  const port = Number(process.env.SMTP_PORT ?? 1127)
+  const port = Number(process.env.SMTP_PORT)
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
 
@@ -24,8 +24,7 @@ function getTransporter(): Transporter | undefined {
 }
 
 export async function sendMail({ to, subject, html }: MailOptions): Promise<void> {
-  const appName = process.env.APP_NAME ?? 'App'
-  const from = process.env.SMTP_FROM ?? `${appName} <noreply@example.com>`
+  const from = process.env.SMTP_FROM
   const transport = getTransporter()
 
   if (!transport) {

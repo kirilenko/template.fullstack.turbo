@@ -5,19 +5,16 @@ import { getDb } from './db/index.js'
 import * as schema from './db/schema/index.js'
 import { sendMail } from './lib/mailer.js'
 
-const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-  .split(',')
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean)
+const adminEmails = process.env.ADMIN_EMAILS?.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean) ?? []
 
-const appUrls = (process.env.PUBLIC_APP_URL ?? '').split(',').map((u) => u.trim()).filter(Boolean)
+const appUrls = process.env.PUBLIC_APP_URL?.split(',').map((u) => u.trim()).filter(Boolean) ?? []
 
 const cookieDomain = process.env.COOKIE_DOMAIN
-const cookiePrefix = process.env.COOKIE_PREFIX ?? 'better-auth'
-const appName = process.env.APP_NAME ?? 'App'
+const cookiePrefix = process.env.COOKIE_PREFIX
+const appName = process.env.APP_NAME
 
 export const auth = betterAuth({
-  baseURL: process.env.PUBLIC_API_URL ?? 'http://localhost:3001',
+  baseURL: process.env.PUBLIC_API_URL,
   user: {
     additionalFields: {
       role: {
@@ -60,7 +57,7 @@ export const auth = betterAuth({
     },
   },
   advanced: {
-    ...(cookiePrefix !== 'better-auth' && { cookiePrefix }),
+    ...(cookiePrefix && { cookiePrefix }),
     ...(cookieDomain && {
       crossSubDomainCookies: { enabled: true, domain: cookieDomain },
     }),

@@ -36,7 +36,7 @@ const parseEnv = <Keys extends string>(
           break
 
         case 'string':
-          acc[key] = value ?? ''
+          acc[key] = value ?? null
           break
 
         case 'url':
