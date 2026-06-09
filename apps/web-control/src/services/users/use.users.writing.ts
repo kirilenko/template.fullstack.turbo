@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { apiFetch } from '@/libs/api'
 
@@ -13,6 +13,7 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
 } {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const deletingRef = useRef(false)
   const [error, setError] = useState('')
 
   const updateUser = useCallback(async (id: string, data: { name?: string; role?: string }) => {
@@ -34,7 +35,8 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
   }, [setUsers])
 
   const deleteUser = useCallback(async (id: string) => {
-    if (deleting) return false
+    if (deletingRef.current) return false
+    deletingRef.current = true
     setDeleting(true)
     setError('')
     try {
@@ -45,9 +47,10 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
       setError(err instanceof Error ? err.message : 'Ошибка удаления')
       return false
     } finally {
+      deletingRef.current = false
       setDeleting(false)
     }
-  }, [deleting, setUsers])
+  }, [setUsers])
 
   return { saving, deleting, error, updateUser, deleteUser }
 }
