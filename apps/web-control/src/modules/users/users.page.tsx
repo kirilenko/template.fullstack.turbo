@@ -4,7 +4,7 @@ import { useRenderLog } from 'react-render-log'
 
 import { useAuth } from '@/services/auth'
 
-import { type User,usersApi } from './users.api'
+import { type User, usersApi } from '@/services/users'
 
 export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
