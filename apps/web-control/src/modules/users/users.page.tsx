@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
 import { Input } from '@packages/ui'
@@ -7,6 +7,91 @@ import { useAuthReading } from '@/services/auth'
 import { type User, useUsersReading, useUsersWriting } from '@/services/users'
 
 type EditingState = { user: User; name: string; role: string }
+
+type UserRowProps = {
+  user: User
+  isCurrentUser: boolean
+  isBeingDeleted: boolean
+  isDeleting: boolean
+  onEdit: (user: User) => void
+  onDelete: (id: string) => void
+  onSetDeletingId: (id: string | null) => void
+}
+
+const UserRow = memo(function UserRow({
+  user,
+  isCurrentUser,
+  isBeingDeleted,
+  isDeleting,
+  onEdit,
+  onDelete,
+  onSetDeletingId,
+}: UserRowProps) {
+  return (
+    <tr className="border-b last:border-0 hover:bg-muted/20">
+      <td className="px-4 py-3 font-medium">{user.name}</td>
+      <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
+      <td className="px-4 py-3">
+        <span
+          className={[
+            'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
+            user.role === 'admin'
+              ? 'bg-primary/10 text-primary'
+              : 'bg-muted text-muted-foreground',
+          ].join(' ')}
+        >
+          {user.role ?? 'user'}
+        </span>
+      </td>
+      <td className="px-4 py-3 text-muted-foreground">
+        {user.emailVerified ? 'Да' : 'Нет'}
+      </td>
+      <td className="px-4 py-3 text-muted-foreground">
+        {new Date(user.createdAt).toLocaleDateString('ru')}
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center justify-end gap-3">
+          {isBeingDeleted ? (
+            <>
+              <span className="text-xs text-muted-foreground">Удалить?</span>
+              <button
+                onClick={() => { void onDelete(user.id) }}
+                disabled={isDeleting}
+                className="text-xs font-medium text-destructive hover:underline disabled:opacity-50"
+              >
+                Да
+              </button>
+              <button
+                onClick={() => onSetDeletingId(null)}
+                disabled={isDeleting}
+                className="text-xs text-muted-foreground hover:underline disabled:opacity-50"
+              >
+                Отмена
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => onEdit(user)}
+                className="text-xs font-medium hover:underline"
+              >
+                Изменить
+              </button>
+              {!isCurrentUser && (
+                <button
+                  onClick={() => onSetDeletingId(user.id)}
+                  className="text-xs font-medium text-destructive hover:underline"
+                >
+                  Удалить
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  )
+})
 
 export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
@@ -19,18 +104,18 @@ export function UsersPage(): JSX.Element {
 
   const error = readError || writeError
 
-  const openEdit = (user: User) =>
-    setEditing({ user, name: user.name, role: user.role ?? 'user' })
+  const openEdit = useCallback((user: User) =>
+    setEditing({ user, name: user.name, role: user.role ?? 'user' }), [])
+
+  const handleDelete = useCallback(async (id: string) => {
+    const ok = await deleteUser(id)
+    if (ok) setDeletingId(null)
+  }, [deleteUser])
 
   const handleSave = async () => {
     if (!editing) return
     const ok = await updateUser(editing.user.id, { name: editing.name, role: editing.role })
     if (ok) setEditing(null)
-  }
-
-  const handleDelete = async (id: string) => {
-    const ok = await deleteUser(id)
-    if (ok) setDeletingId(null)
   }
 
   return (
@@ -65,68 +150,16 @@ export function UsersPage(): JSX.Element {
                 </tr>
               )}
               {users.map((user) => (
-                <tr key={user.id} className="border-b last:border-0 hover:bg-muted/20">
-                  <td className="px-4 py-3 font-medium">{user.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={[
-                        'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
-                        user.role === 'admin'
-                          ? 'bg-primary/10 text-primary'
-                          : 'bg-muted text-muted-foreground',
-                      ].join(' ')}
-                    >
-                      {user.role ?? 'user'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {user.emailVerified ? 'Да' : 'Нет'}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {new Date(user.createdAt).toLocaleDateString('ru')}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-3">
-                      {deletingId === user.id ? (
-                        <>
-                          <span className="text-xs text-muted-foreground">Удалить?</span>
-                          <button
-                            onClick={() => { void handleDelete(user.id) }}
-                            disabled={deleting}
-                            className="text-xs font-medium text-destructive hover:underline disabled:opacity-50"
-                          >
-                            Да
-                          </button>
-                          <button
-                            onClick={() => setDeletingId(null)}
-                            disabled={deleting}
-                            className="text-xs text-muted-foreground hover:underline disabled:opacity-50"
-                          >
-                            Отмена
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => openEdit(user)}
-                            className="text-xs font-medium hover:underline"
-                          >
-                            Изменить
-                          </button>
-                          {user.id !== currentUser?.id && (
-                            <button
-                              onClick={() => setDeletingId(user.id)}
-                              className="text-xs font-medium text-destructive hover:underline"
-                            >
-                              Удалить
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                <UserRow
+                  key={user.id}
+                  user={user}
+                  isCurrentUser={user.id === currentUser?.id}
+                  isBeingDeleted={deletingId === user.id}
+                  isDeleting={deletingId === user.id ? deleting : false}
+                  onEdit={openEdit}
+                  onDelete={handleDelete}
+                  onSetDeletingId={setDeletingId}
+                />
               ))}
             </tbody>
           </table>

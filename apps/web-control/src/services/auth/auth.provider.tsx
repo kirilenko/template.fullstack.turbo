@@ -13,7 +13,10 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     window.location.href = '/login'
   }, [])
 
-  const user = session?.user ?? null
+  // Stabilize user reference by identity — better-auth may return a new object on each poll
+  const userId = session?.user?.id ?? null
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const user = useMemo(() => session?.user ?? null, [userId])
   const role = (user?.role ?? null) as AuthRole | null
 
   const value = useMemo(

@@ -18,9 +18,14 @@ export function useUsersReading(): {
     setIsLoading(true)
     setError('')
     apiFetch<User[]>('/api/admin/users')
-      .then(setUsers)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка загрузки'))
-      .finally(() => setIsLoading(false))
+      .then((data) => {
+        setUsers(data)
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : 'Ошибка загрузки')
+        setIsLoading(false)
+      })
   }, [])
 
   return { users, setUsers, isLoading, error }
