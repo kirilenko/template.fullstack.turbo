@@ -13,28 +13,51 @@ import {
 
 import { useTheme } from './theme.provider'
 
+const THEMES = [
+  { value: 'light', label: 'Светлая' },
+  { value: 'dark', label: 'Тёмная' },
+  { value: 'system', label: 'Системная' },
+] as const
+
 const ThemeSwitcher: FC = () => {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
+
+  const isDark =
+    theme === 'dark' ||
+    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all duration-1000 dark:scale-0 dark:-rotate-270" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-270 transition-all duration-1000 dark:scale-100 dark:rotate-0" />
+        <Button variant="outline" size="icon" className="size-10">
+          {isDark ? (
+            <Moon className="h-[1.2rem] w-[1.2rem]" />
+          ) : (
+            <Sun className="h-[1.2rem] w-[1.2rem]" />
+          )}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Светлая
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Тёмная
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          Системная
-        </DropdownMenuItem>
+      <DropdownMenuContent
+        align="end"
+        className="flex flex-col gap-1 p-2 min-w-[130px]"
+        style={{ backgroundColor: 'var(--popover)' }}
+      >
+        {THEMES.map(({ value, label }) => (
+          <DropdownMenuItem
+            key={value}
+            className={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              theme === value
+                ? 'bg-sidebar-accent text-sidebar-accent-foreground focus:bg-sidebar-accent focus:text-sidebar-accent-foreground'
+                : 'focus:bg-sidebar-accent/50 focus:text-sidebar-accent-foreground',
+            ].join(' ')}
+            style={{ cursor: 'pointer' }}
+            onClick={() => setTheme(value)}
+          >
+            {label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )
