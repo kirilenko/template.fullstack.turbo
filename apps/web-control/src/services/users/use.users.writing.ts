@@ -6,13 +6,11 @@ import type { User } from './users.schema'
 
 export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<User[]>>): {
   saving: boolean
-  deleting: boolean
   error: string
   updateUser: (id: string, data: { name?: string; role?: string }) => Promise<boolean>
   deleteUser: (id: string) => Promise<boolean>
 } {
   const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
   const deletingRef = useRef(false)
   const [error, setError] = useState('')
 
@@ -37,10 +35,9 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
   const deleteUser = useCallback(async (id: string) => {
     if (deletingRef.current) return false
     deletingRef.current = true
-    setDeleting(true)
-    setError('')
     try {
       await apiFetch<{ success: boolean }>(`/api/admin/users/${id}`, { method: 'DELETE' })
+      setError('')
       setUsers((prev) => prev.filter((u) => u.id !== id))
       return true
     } catch (err) {
@@ -48,9 +45,8 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
       return false
     } finally {
       deletingRef.current = false
-      setDeleting(false)
     }
   }, [setUsers])
 
-  return { saving, deleting, error, updateUser, deleteUser }
+  return { saving, error, updateUser, deleteUser }
 }
