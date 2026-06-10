@@ -88,4 +88,5 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
   context: { isAdmin: false, isAuthenticated: false },
   routeTree,
+  defaultStaleTime: Infinity,
 })
