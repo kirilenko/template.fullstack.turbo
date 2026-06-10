@@ -8,7 +8,7 @@ import { Input } from '@packages/ui'
 
 import { UserRow } from './user-row/index'
 
-type EditingState = { user: User; name: string; role: string }
+type EditingState = { user: User; name: string; role: 'admin' | 'user' }
 
 export function UsersPage({ initialUsers }: { initialUsers: User[] }): JSX.Element {
   useRenderLog()('UsersPage')()
@@ -88,7 +88,7 @@ export function UsersPage({ initialUsers }: { initialUsers: User[] }): JSX.Eleme
                 <label className="text-sm font-medium">Роль</label>
                 <select
                   value={editing.role}
-                  onChange={(e) => setEditing((prev) => prev && { ...prev, role: e.target.value })}
+                  onChange={(e) => setEditing((prev) => prev && { ...prev, role: e.target.value as 'admin' | 'user' })}
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 >
                   <option value="user">user</option>

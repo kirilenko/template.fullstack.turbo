@@ -37,8 +37,7 @@ const app = new Hono<{
   .on(['POST', 'GET'], '/api/auth/*', (c) => auth.handler(c.req.raw))
   .route('/', health)
   .route('/api/users', usersRoute)
-
-app.route('/api/admin', adminRoute)
+  .route('/api/admin', adminRoute)
 
 app.notFound((c) => c.json({ error: 'Not found' }, 404))
 app.onError((err, c) => {

@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 
-import { apiFetch } from '@/libs/api'
+import { apiClient } from '@/libs/api'
 
 import type { NewsItem } from './news.schema'
 
@@ -20,10 +20,7 @@ export function useNewsWriting(setNews: React.Dispatch<React.SetStateAction<News
   const createNews = useCallback(async (data: NewsPayload) => {
     setSaving(true)
     try {
-      const created = await apiFetch<NewsItem>('/api/admin/news', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      })
+      const created = await apiClient.admin.news.create(data)
       setError('')
       setNews((prev) => [...prev, created])
       return true
@@ -38,10 +35,7 @@ export function useNewsWriting(setNews: React.Dispatch<React.SetStateAction<News
   const updateNews = useCallback(async (id: string, data: Partial<NewsPayload>) => {
     setSaving(true)
     try {
-      const updated = await apiFetch<NewsItem>(`/api/admin/news/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      })
+      const updated = await apiClient.admin.news.update(id, data)
       setError('')
       setNews((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
       return true
@@ -57,7 +51,7 @@ export function useNewsWriting(setNews: React.Dispatch<React.SetStateAction<News
     if (deletingRef.current) return false
     deletingRef.current = true
     try {
-      await apiFetch<{ success: boolean }>(`/api/admin/news/${id}`, { method: 'DELETE' })
+      await apiClient.admin.news.delete(id)
       setError('')
       setNews((prev) => prev.filter((item) => item.id !== id))
       return true

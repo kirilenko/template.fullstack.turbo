@@ -1,26 +1,9 @@
 import { env } from '@/config'
+import { ApiError, createApiClient } from '@packages/api-client'
 
-export class ApiError extends Error {
-  status: number
+export { ApiError }
 
-  constructor(status: number, message: string) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-  }
-}
-
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${env.PUBLIC_API_URL}${path}`, {
-    ...init,
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  })
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ error: res.statusText }))
-    throw new ApiError(res.status, (body as { error?: string }).error ?? `HTTP ${res.status}`)
-  }
-
-  return res.json() as Promise<T>
-}
+export const apiClient = createApiClient(env.PUBLIC_API_URL, {
+  init: { credentials: 'include' },
+  headers: { 'Content-Type': 'application/json' },
+})

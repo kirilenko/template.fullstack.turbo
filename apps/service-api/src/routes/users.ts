@@ -1,3 +1,4 @@
+import { zValidator } from '@hono/zod-validator'
 import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -14,6 +15,12 @@ const updateProfileSchema = z.object({
 
 type Env = AuthEnv & { Variables: { db: Database } }
 
+type UserRow = {
+  id: string; name: string; email: string; role: string | null
+  emailVerified: boolean; image: string | null
+  createdAt: string; updatedAt: string
+}
+
 export const usersRoute = new Hono<Env>()
   .use(requireAuth)
   .use(dbMiddleware)
@@ -26,25 +33,21 @@ export const usersRoute = new Hono<Env>()
 
     if (!user) return c.json({ error: 'User not found' }, 404)
 
-    return c.json(user)
+    return c.json(user as unknown as UserRow)
   })
 
-  .patch('/me', async (c) => {
+  .patch('/me', zValidator('json', updateProfileSchema), async (c) => {
     const db = c.var.db
     const userId = getUserId(c)
-
-    const body = updateProfileSchema.safeParse(await c.req.json())
-    if (!body.success) {
-      return c.json({ details: body.error.flatten(), error: 'Validation failed' }, 400)
-    }
+    const data = c.req.valid('json')
 
     const [updated] = await db
       .update(users)
-      .set({ ...body.data, updatedAt: new Date() })
+      .set({ ...data, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning()
 
-    return c.json(updated)
+    return c.json(updated as unknown as UserRow)
   })
 
   .delete('/me', async (c) => {

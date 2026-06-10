@@ -1,27 +1,24 @@
 import { useCallback, useRef, useState } from 'react'
 
-import { apiFetch } from '@/libs/api'
+import { apiClient } from '@/libs/api'
 
 import type { User } from './users.schema'
 
 export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<User[]>>): {
   saving: boolean
   error: string
-  updateUser: (id: string, data: { name?: string; role?: string }) => Promise<boolean>
+  updateUser: (id: string, data: { name?: string; role?: 'admin' | 'user' }) => Promise<boolean>
   deleteUser: (id: string) => Promise<boolean>
 } {
   const [saving, setSaving] = useState(false)
   const deletingRef = useRef(false)
   const [error, setError] = useState('')
 
-  const updateUser = useCallback(async (id: string, data: { name?: string; role?: string }) => {
+  const updateUser = useCallback(async (id: string, data: { name?: string; role?: 'admin' | 'user' }) => {
     setSaving(true)
-    setError('')
     try {
-      const updated = await apiFetch<User>(`/api/admin/users/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      })
+      const updated = await apiClient.admin.users.update(id, data)
+      setError('')
       setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)))
       return true
     } catch (err) {
@@ -36,7 +33,7 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
     if (deletingRef.current) return false
     deletingRef.current = true
     try {
-      await apiFetch<{ success: boolean }>(`/api/admin/users/${id}`, { method: 'DELETE' })
+      await apiClient.admin.users.delete(id)
       setError('')
       setUsers((prev) => prev.filter((u) => u.id !== id))
       return true
