@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { RouterProvider } from '@tanstack/react-router'
 
 import { AuthProvider, useAuthReading } from '@/services/auth'
@@ -9,24 +9,27 @@ import { router } from './app.router'
 
 function AppRouter(): JSX.Element {
   const { isAuthenticated, isLoaded, role } = useAuthReading()
-  const [hasLoaded, setHasLoaded] = useState(false)
+  const [ready, setReady] = useState(false)
+  const isInitialLoad = useRef(true)
 
   useEffect(() => {
-    if (isLoaded) setHasLoaded(true)
-  }, [isLoaded])
-
-  useEffect(() => {
-    if (isLoaded) void router.invalidate()
+    if (!isLoaded) return
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false
+      setReady(true)
+      return
+    }
+    void router.invalidate()
   }, [isAuthenticated, isLoaded, role])
 
-  if (!hasLoaded) return <></>
-
-  return (
-    <RouterProvider
-      router={router}
-      context={{ isAdmin: role === 'admin', isAuthenticated }}
-    />
+  const context = useMemo(
+    () => ({ isAdmin: role === 'admin', isAuthenticated }),
+    [role, isAuthenticated],
   )
+
+  if (!ready) return <></>
+
+  return <RouterProvider router={router} context={context} />
 }
 
 export function App(): JSX.Element {

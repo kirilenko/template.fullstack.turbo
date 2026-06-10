@@ -10,15 +10,13 @@ import { UserRow } from './user-row/index'
 
 type EditingState = { user: User; name: string; role: string }
 
-export function UsersPage(): JSX.Element {
+export function UsersPage({ initialUsers }: { initialUsers: User[] }): JSX.Element {
   useRenderLog()('UsersPage')()
   const { user: currentUser } = useAuthReading()
-  const { users, setUsers, isLoading, error: readError } = useUsersReading()
-  const { saving, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
+  const { users, setUsers } = useUsersReading(initialUsers)
+  const { saving, updateUser, deleteUser, error } = useUsersWriting(setUsers)
 
   const [editing, setEditing] = useState<EditingState | null>(null)
-
-  const error = readError || writeError
 
   const openEdit = useCallback((user: User) =>
     setEditing({ user, name: user.name, role: user.role ?? 'user' }), [])
@@ -38,41 +36,37 @@ export function UsersPage(): JSX.Element {
       )}
 
       <div className="mt-6 overflow-hidden rounded-xl border bg-card">
-        {isLoading ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">Загрузка...</div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Имя</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Роль</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email подтверждён</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Создан</th>
-                <th className="px-4 py-3" />
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-muted/40">
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Имя</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Роль</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email подтверждён</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Создан</th>
+              <th className="px-4 py-3" />
+            </tr>
+          </thead>
+          <tbody>
+            {users.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                  Нет пользователей
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {users.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                    Нет пользователей
-                  </td>
-                </tr>
-              )}
-              {users.map((user) => (
-                <UserRow
-                  key={user.id}
-                  renderLogId={user.id}
-                  user={user}
-                  isCurrentUser={user.id === currentUser?.id}
-                  onEdit={openEdit}
-                  onDelete={deleteUser}
-                />
-              ))}
-            </tbody>
-          </table>
-        )}
+            )}
+            {users.map((user) => (
+              <UserRow
+                key={user.id}
+                renderLogId={user.id}
+                user={user}
+                isCurrentUser={user.id === currentUser?.id}
+                onEdit={openEdit}
+                onDelete={deleteUser}
+              />
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {editing && (

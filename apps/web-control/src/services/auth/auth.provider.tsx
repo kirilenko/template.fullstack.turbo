@@ -1,5 +1,5 @@
 import type { JSX, ReactNode } from 'react'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import { authClient } from './auth.client'
 import { AuthContext } from './auth.context'
@@ -22,15 +22,20 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   // Stabilize by both id and role so a server-side role change is picked up
   const user = useMemo(() => session?.user ?? null, [userId, sessionRole]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Once loaded, stays loaded — prevents context churn during background session revalidation
+  const wasLoadedRef = useRef(false)
+  if (!isPending) wasLoadedRef.current = true
+  const isLoaded = wasLoadedRef.current
+
   const value = useMemo(
     () => ({
       isAuthenticated: !!user,
-      isLoaded: !isPending,
+      isLoaded,
       role: sessionRole,
       signOut,
       user,
     }),
-    [user, isPending, sessionRole, signOut],
+    [user, isLoaded, sessionRole, signOut],
   )
 
   return <AuthContext value={value}>{children}</AuthContext>

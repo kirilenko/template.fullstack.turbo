@@ -7,9 +7,11 @@ import {
 } from '@tanstack/react-router'
 
 import { paths } from '@/config'
+import { apiFetch } from '@/libs/api'
 import { LoginPage, LogoutPage, RegisterPage, UnauthorizedPage } from '@/modules/auth'
 import { HomePage } from '@/modules/home'
 import { UsersPage } from '@/modules/users'
+import type { User } from '@/services/users'
 
 import { Layout } from './layout'
 
@@ -84,10 +86,16 @@ const profileRoute = createRoute({
   path: paths.profile,
 })
 
+function UsersPageLoaded() {
+  const users = usersRoute.useLoaderData()
+  return <UsersPage initialUsers={users} />
+}
+
 const usersRoute = createRoute({
-  component: UsersPage,
+  component: UsersPageLoaded,
   getParentRoute: () => adminRoute,
   path: paths.users,
+  loader: (): Promise<User[]> => apiFetch<User[]>('/api/admin/users'),
 })
 
 const logoutRoute = createRoute({
