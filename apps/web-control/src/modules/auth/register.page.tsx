@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 import { Link } from '@tanstack/react-router'
 import { Eye, EyeOff } from 'lucide-react'
-import { useRenderLog } from 'react-render-log'
 
-import { Input } from '@packages/ui'
 import { paths } from '@/config'
 import { useAuthWriting } from '@/services/auth'
+import { Input } from '@packages/ui'
 
 export function RegisterPage() {
   useRenderLog()('RegisterPage')()

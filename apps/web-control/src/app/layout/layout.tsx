@@ -1,10 +1,10 @@
 import type { JSX } from 'react'
-import { Link, Outlet, useLocation } from '@tanstack/react-router'
-import { ThemeSwitcher } from '@packages/lib/theme'
 import { useRenderLog } from 'react-render-log'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
 
 import { paths } from '@/config'
 import { useAuthReading } from '@/services/auth'
+import { ThemeSwitcher } from '@packages/lib/theme'
 
 const NAV_ITEMS = [
   { label: 'Dashboard', to: paths.home },

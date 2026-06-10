@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
-import { authClient } from '@/services/auth/auth.client'
 import { RenderLogIslandProvider } from '@/libs/render-log-provider'
+import { authClient } from '@/services/auth/auth.client'
 
 function RegisterFormInner() {
   useRenderLog()('RegisterForm')()

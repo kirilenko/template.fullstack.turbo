@@ -2,9 +2,9 @@ import type { JSX } from 'react'
 import { useCallback, useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 
-import { Input } from '@packages/ui'
 import { useAuthReading } from '@/services/auth'
 import { type User, useUsersReading, useUsersWriting } from '@/services/users'
+import { Input } from '@packages/ui'
 
 import { UserRow } from './user-row/index'
 
@@ -14,9 +14,8 @@ export function UsersPage(): JSX.Element {
   useRenderLog()('UsersPage')()
   const { user: currentUser } = useAuthReading()
   const { users, setUsers, isLoading, error: readError } = useUsersReading()
-  const { saving, deleting, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
+  const { saving, updateUser, deleteUser, error: writeError } = useUsersWriting(setUsers)
 
-  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editing, setEditing] = useState<EditingState | null>(null)
 
   const error = readError || writeError
@@ -24,16 +23,11 @@ export function UsersPage(): JSX.Element {
   const openEdit = useCallback((user: User) =>
     setEditing({ user, name: user.name, role: user.role ?? 'user' }), [])
 
-  const handleDelete = useCallback(async (id: string) => {
-    await deleteUser(id)
-    setDeletingId(null)
-  }, [deleteUser])
-
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!editing) return
     const ok = await updateUser(editing.user.id, { name: editing.name, role: editing.role })
     if (ok) setEditing(null)
-  }
+  }, [editing, updateUser])
 
   return (
     <div className="p-6">
@@ -72,12 +66,8 @@ export function UsersPage(): JSX.Element {
                   renderLogId={user.id}
                   user={user}
                   isCurrentUser={user.id === currentUser?.id}
-                  isBeingDeleted={deletingId === user.id}
-                  isDeleting={deletingId === user.id ? deleting : false}
-                  isAnyDeleting={deleting}
                   onEdit={openEdit}
-                  onDelete={handleDelete}
-                  onSetDeletingId={setDeletingId}
+                  onDelete={deleteUser}
                 />
               ))}
             </tbody>

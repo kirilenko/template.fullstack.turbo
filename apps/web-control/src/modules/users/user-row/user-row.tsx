@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { type PropsWithRenderLog, withRenderLog } from 'react-render-log'
 
 import type { User } from '@/services/users'
@@ -6,24 +6,23 @@ import type { User } from '@/services/users'
 export type UserRowProps = PropsWithRenderLog<{
   user: User
   isCurrentUser: boolean
-  isBeingDeleted: boolean
-  isDeleting: boolean
-  isAnyDeleting: boolean
   onEdit: (user: User) => void
-  onDelete: (id: string) => void
-  onSetDeletingId: (id: string | null) => void
+  onDelete: (id: string) => Promise<boolean>
 }>
 
-function UserRowBase({
-  user,
-  isCurrentUser,
-  isBeingDeleted,
-  isDeleting,
-  isAnyDeleting,
-  onEdit,
-  onDelete,
-  onSetDeletingId,
-}: UserRowProps) {
+function UserRowBase({ user, isCurrentUser, onEdit, onDelete }: UserRowProps) {
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true)
+    const ok = await onDelete(user.id)
+    if (!ok) {
+      setIsDeleting(false)
+      setIsConfirming(false)
+    }
+  }
+
   return (
     <tr className="border-b last:border-0 hover:bg-muted/20">
       <td className="px-4 py-3 font-medium">{user.name}</td>
@@ -48,18 +47,18 @@ function UserRowBase({
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-3">
-          {isBeingDeleted ? (
+          {isConfirming ? (
             <>
               <span className="text-xs text-muted-foreground">Удалить?</span>
               <button
-                onClick={() => { void onDelete(user.id) }}
+                onClick={() => { void handleDeleteConfirm() }}
                 disabled={isDeleting}
                 className="text-xs font-medium text-destructive hover:underline disabled:opacity-50"
               >
                 Да
               </button>
               <button
-                onClick={() => onSetDeletingId(null)}
+                onClick={() => setIsConfirming(false)}
                 disabled={isDeleting}
                 className="text-xs text-muted-foreground hover:underline disabled:opacity-50"
               >
@@ -76,9 +75,8 @@ function UserRowBase({
               </button>
               {!isCurrentUser && (
                 <button
-                  onClick={() => onSetDeletingId(user.id)}
-                  disabled={isAnyDeleting}
-                  className="text-xs font-medium text-destructive hover:underline disabled:opacity-50"
+                  onClick={() => setIsConfirming(true)}
+                  className="text-xs font-medium text-destructive hover:underline"
                 >
                   Удалить
                 </button>

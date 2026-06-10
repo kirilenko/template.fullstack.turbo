@@ -1,9 +1,9 @@
 import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
 import { RouterProvider } from '@tanstack/react-router'
-import { ThemeProvider } from '@packages/lib/theme'
 
 import { AuthProvider, useAuthReading } from '@/services/auth'
+import { ThemeProvider } from '@packages/lib/theme'
 
 import { router } from './app.router'
 

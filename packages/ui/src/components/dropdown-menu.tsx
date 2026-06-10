@@ -1,13 +1,13 @@
 import {
+  type ComponentProps,
   createContext,
-  useContext,
-  useRef,
-  useState,
-  useEffect,
   isValidElement,
   type ReactNode,
-  type ComponentProps,
   type RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
 } from 'react'
 import { createPortal } from 'react-dom'
 
