@@ -1,4 +1,4 @@
-import { createRoute, lazyRouteComponent } from '@tanstack/react-router'
+import { type AnyRoute, createRoute, lazyRouteComponent } from '@tanstack/react-router'
 
 import { paths } from '@/config'
 
@@ -6,6 +6,6 @@ const ProfilePage = lazyRouteComponent(() =>
   import('./profile.page').then((m) => ({ default: m.ProfilePage })),
 )
 
-export function createProfileRoute<TParent>(getParentRoute: () => TParent) {
+export function createProfileRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
   return createRoute({ getParentRoute, path: paths.profile, component: ProfilePage })
 }
