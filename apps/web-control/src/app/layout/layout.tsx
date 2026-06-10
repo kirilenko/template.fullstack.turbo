@@ -1,10 +1,12 @@
 import type { JSX } from 'react'
 import { useRenderLog } from 'react-render-log'
-import { Link, Outlet, useLocation } from '@tanstack/react-router'
+import { Link, Outlet } from '@tanstack/react-router'
 
 import { paths } from '@/config'
 import { useAuthReading } from '@/services/auth'
 import { ThemeSwitcher } from '@packages/lib/theme'
+
+const NAV_BASE = 'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors'
 
 const NAV_ITEMS = [
   { label: 'Dashboard', to: paths.home },
@@ -15,7 +17,6 @@ const NAV_ITEMS = [
 export function Layout(): JSX.Element {
   useRenderLog()('Layout')()
   const { user } = useAuthReading()
-  const location = useLocation()
 
   return (
     <div className="flex h-full">
@@ -24,23 +25,17 @@ export function Layout(): JSX.Element {
           <span className="font-semibold text-sidebar-foreground">Admin</span>
         </div>
         <nav className="flex flex-col gap-1 p-2">
-          {NAV_ITEMS.map(({ label, to }) => {
-            const isActive = location.pathname === to
-            return (
-              <Link
-                key={to}
-                to={to}
-                className={[
-                  'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
-                ].join(' ')}
-              >
-                {label}
-              </Link>
-            )
-          })}
+          {NAV_ITEMS.map(({ label, to }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`${NAV_BASE} text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground`}
+              activeProps={{ className: `${NAV_BASE} bg-sidebar-accent text-sidebar-accent-foreground` }}
+              activeOptions={{ exact: true }}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
       </aside>
 
