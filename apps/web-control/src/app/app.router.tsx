@@ -8,6 +8,7 @@ import {
 import { paths } from '@/config'
 import { createLoginRoute, createLogoutRoute, createRegisterRoute, createUnauthorizedRoute } from '@/modules/auth'
 import { createHomeRoute } from '@/modules/home'
+import { createNewsRoute } from '@/modules/news'
 import { createProfileRoute } from '@/modules/profile'
 import { createUsersRoute } from '@/modules/users'
 
@@ -69,6 +70,7 @@ const publicOnlyRoute = createRoute({
 })
 
 const homeRoute = createHomeRoute(() => adminRoute)
+const newsRoute = createNewsRoute(() => adminRoute)
 const profileRoute = createProfileRoute(() => adminRoute)
 const usersRoute = createUsersRoute(() => adminRoute)
 const logoutRoute = createLogoutRoute(() => privateRoute)
@@ -78,7 +80,7 @@ const unauthorizedRoute = createUnauthorizedRoute(() => layoutRoute)
 
 const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
-    adminRoute.addChildren([homeRoute, profileRoute, usersRoute]),
+    adminRoute.addChildren([homeRoute, newsRoute, profileRoute, usersRoute]),
     privateRoute.addChildren([logoutRoute]),
     unauthorizedRoute,
   ]),

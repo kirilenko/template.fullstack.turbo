@@ -8,9 +8,17 @@ import { ThemeSwitcher } from '@packages/lib/theme'
 
 const NAV_BASE = 'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors'
 
-const NAV_ITEMS = [
+type NavItem = {
+  label: string
+  to: string
+  // 'intent' — preload on hover; omit for load-on-navigation (default)
+  preload?: 'intent' | 'render' | false
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', to: paths.home },
   { label: 'Пользователи', to: paths.users },
+  { label: 'Новости', to: paths.news, preload: 'intent' },
   { label: 'Профиль', to: paths.profile },
 ]
 
@@ -25,10 +33,11 @@ export function Layout(): JSX.Element {
           <span className="font-semibold text-sidebar-foreground">Admin</span>
         </div>
         <nav className="flex flex-col gap-1 p-2">
-          {NAV_ITEMS.map(({ label, to }) => (
+          {NAV_ITEMS.map(({ label, to, preload }) => (
             <Link
               key={to}
               to={to}
+              preload={preload}
               className={`${NAV_BASE} text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground`}
               activeProps={{ className: `${NAV_BASE} bg-sidebar-accent text-sidebar-accent-foreground` }}
               activeOptions={{ exact: true }}

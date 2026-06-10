@@ -29,9 +29,13 @@ React SPA. Accessible only to users with `role = admin`.
 
 - `/login` — admin login
 - `/` — dashboard
+- `/users` — user management
+- `/news` — news management
 - `/profile` — admin profile
 
 Admins are created automatically on registration if their email is listed in the `ADMIN_EMAILS` env variable. No registration form in the admin panel.
+
+→ [Developer guide: module structure, routing, data loading patterns](docs/web-control.md)
 
 ### service-api — REST API
 
