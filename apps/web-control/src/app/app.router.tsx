@@ -2,16 +2,14 @@ import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
-  lazyRouteComponent,
   redirect,
 } from '@tanstack/react-router'
 
 import { paths } from '@/config'
-import { apiFetch } from '@/libs/api'
-import { LoginPage, LogoutPage, RegisterPage, UnauthorizedPage } from '@/modules/auth'
-import { HomePage } from '@/modules/home'
-import { UsersPage } from '@/modules/users'
-import type { User } from '@/services/users'
+import { createLoginRoute, createLogoutRoute, createRegisterRoute, createUnauthorizedRoute } from '@/modules/auth'
+import { createHomeRoute } from '@/modules/home'
+import { createProfileRoute } from '@/modules/profile'
+import { createUsersRoute } from '@/modules/users'
 
 import { Layout } from './layout'
 
@@ -70,57 +68,13 @@ const publicOnlyRoute = createRoute({
   id: '_public-only',
 })
 
-const homeRoute = createRoute({
-  component: HomePage,
-  getParentRoute: () => adminRoute,
-  path: paths.home,
-})
-
-const ProfilePage = lazyRouteComponent(() =>
-  import('@/modules/profile').then((m) => ({ default: m.ProfilePage })),
-)
-
-const profileRoute = createRoute({
-  component: ProfilePage,
-  getParentRoute: () => adminRoute,
-  path: paths.profile,
-})
-
-function UsersPageLoaded() {
-  const users = usersRoute.useLoaderData()
-  return <UsersPage initialUsers={users} />
-}
-
-const usersRoute = createRoute({
-  component: UsersPageLoaded,
-  getParentRoute: () => adminRoute,
-  path: paths.users,
-  loader: (): Promise<User[]> => apiFetch<User[]>('/api/admin/users'),
-})
-
-const logoutRoute = createRoute({
-  component: LogoutPage,
-  getParentRoute: () => privateRoute,
-  path: paths.logout,
-})
-
-const loginRoute = createRoute({
-  component: LoginPage,
-  getParentRoute: () => publicOnlyRoute,
-  path: paths.login,
-})
-
-const registerRoute = createRoute({
-  component: RegisterPage,
-  getParentRoute: () => publicOnlyRoute,
-  path: paths.register,
-})
-
-const unauthorizedRoute = createRoute({
-  component: UnauthorizedPage,
-  getParentRoute: () => layoutRoute,
-  path: paths.unauthorized,
-})
+const homeRoute = createHomeRoute(() => adminRoute)
+const profileRoute = createProfileRoute(() => adminRoute)
+const usersRoute = createUsersRoute(() => adminRoute)
+const logoutRoute = createLogoutRoute(() => privateRoute)
+const loginRoute = createLoginRoute(() => publicOnlyRoute)
+const registerRoute = createRegisterRoute(() => publicOnlyRoute)
+const unauthorizedRoute = createUnauthorizedRoute(() => layoutRoute)
 
 const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
