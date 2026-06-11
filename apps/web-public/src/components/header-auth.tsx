@@ -1,11 +1,17 @@
+import { useEffect } from 'react'
 import { useRenderLog } from 'react-render-log'
 
 import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { authClient } from '@/services/auth/auth.client'
+import { $session } from '@/stores/session'
 
 function HeaderAuthInner() {
   useRenderLog()('HeaderAuth')()
   const { data: session, isPending } = authClient.useSession()
+
+  useEffect(() => {
+    $session.set({ data: session ?? null, isPending })
+  }, [session, isPending])
 
   if (isPending) return <div className="h-8 w-20 animate-pulse rounded bg-muted" />
 

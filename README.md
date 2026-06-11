@@ -41,6 +41,8 @@ Astro + React islands. Available to all registered users.
 - `/forgot-password`, `/reset-password` — password reset
 - `/profile` — user cabinet (auth required, redirects to `/sign-in` if not)
 
+→ [Developer guide: islands architecture, session store, Nanostores pattern](docs/web-public.md)
+
 #### web-control — admin panel
 
 React SPA + TanStack Router. Accessible only to users with `role = admin`.
