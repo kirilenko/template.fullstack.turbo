@@ -32,10 +32,10 @@ export function RegisterPage() {
 
     try {
       const result = await signUp({
-        email,
-        password,
-        name: name.trim(),
         callbackURL: window.location.origin + '/',
+        email,
+        name: name.trim(),
+        password,
       })
 
       if (result.error) {

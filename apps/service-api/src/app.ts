@@ -17,6 +17,7 @@ const app = new Hono<{
   .use(
     '*',
     cors({
+      credentials: true,
       origin: (origin) => {
         // In dev allow any localhost origin (ports can shift between runs)
         if (process.env.NODE_ENV !== 'production' && /^https?:\/\/localhost(:\d+)?$/.test(origin ?? '')) {
@@ -25,7 +26,6 @@ const app = new Hono<{
         const allowed = (process.env.PUBLIC_APP_URL ?? '').split(',').map((u) => u.trim()).filter(Boolean)
         return allowed.find((u) => u === origin) ?? null
       },
-      credentials: true,
     }),
   )
   .use('*', async (c, next) => {

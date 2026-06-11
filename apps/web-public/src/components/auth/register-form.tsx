@@ -34,10 +34,10 @@ function RegisterFormInner() {
 
     try {
       const result = await authClient.signUp.email({
-        name,
-        email,
-        password,
         callbackURL: window.location.origin + '/profile',
+        email,
+        name,
+        password,
       })
       if (result.error) {
         setError(result.error.message ?? 'Ошибка регистрации')

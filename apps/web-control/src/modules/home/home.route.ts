@@ -5,5 +5,5 @@ import { paths } from '@/config'
 import { HomePage } from './home.page'
 
 export function createHomeRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
-  return createRoute({ getParentRoute, path: paths.home, component: HomePage })
+  return createRoute({ component: HomePage, getParentRoute, path: paths.home })
 }

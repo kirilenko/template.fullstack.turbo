@@ -4,8 +4,8 @@ import { cn } from '../lib/cn'
 
 function Select({
   className,
-  onValueChange,
   onChange,
+  onValueChange,
   ...props
 }: ComponentProps<'select'> & { onValueChange?: (value: string) => void }) {
   return (

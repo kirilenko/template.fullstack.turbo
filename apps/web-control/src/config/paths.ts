@@ -5,6 +5,6 @@ export const paths = {
   news: '/news',
   profile: '/profile',
   register: '/register',
-  users: '/users',
   unauthorized: '/unauthorized',
+  users: '/users',
 } as const

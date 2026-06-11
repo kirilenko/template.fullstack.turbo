@@ -28,7 +28,7 @@ type UseGuard = (props: {
   publicOnlyLoader: LoaderFunction
 }
 
-const useGuard: UseGuard = ({ authorized, absoluteAuthPaths }) => {
+const useGuard: UseGuard = ({ absoluteAuthPaths, authorized }) => {
   const authorizedRef = useRef(authorized)
   authorizedRef.current = authorized
 

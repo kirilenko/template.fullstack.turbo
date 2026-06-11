@@ -14,13 +14,13 @@ import {
 import { useTheme } from './theme.provider'
 
 const THEMES = [
-  { value: 'light', label: 'Светлая' },
-  { value: 'dark', label: 'Тёмная' },
-  { value: 'system', label: 'Системная' },
+  { label: 'Светлая', value: 'light' },
+  { label: 'Тёмная', value: 'dark' },
+  { label: 'Системная', value: 'system' },
 ] as const
 
 const ThemeSwitcher: FC = () => {
-  const { theme, setTheme } = useTheme()
+  const { setTheme, theme } = useTheme()
 
   const isDark =
     theme === 'dark' ||
@@ -43,7 +43,7 @@ const ThemeSwitcher: FC = () => {
         className="flex flex-col gap-1 p-2 min-w-[130px]"
         style={{ backgroundColor: 'var(--popover)' }}
       >
-        {THEMES.map(({ value, label }) => (
+        {THEMES.map(({ label, value }) => (
           <DropdownMenuItem
             key={value}
             className={[

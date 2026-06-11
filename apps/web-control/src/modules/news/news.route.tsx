@@ -8,13 +8,13 @@ import { NewsPage } from './news.page'
 
 export function createNewsRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
   const route = createRoute({
-    getParentRoute,
-    path: paths.news,
-    loader: () => apiClient.admin.news.list(),
     component: function NewsPageLoaded() {
       const news = route.useLoaderData() as NewsItem[]
       return <NewsPage initialNews={news} />
     },
+    getParentRoute,
+    loader: () => apiClient.admin.news.list(),
+    path: paths.news,
   })
   return route
 }

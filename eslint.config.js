@@ -30,7 +30,6 @@ export default [
     },
     rules: {
       'react-refresh/only-export-components': 'off',
-      'sort-keys-fix/sort-keys-fix': 'off',
     },
   },
   {

@@ -19,11 +19,11 @@ function getTransporter(): Transporter | undefined {
 
   if (!host || !user || !pass) return undefined
 
-  transporter = nodemailer.createTransport({ host, port, secure: true, auth: { user, pass } })
+  transporter = nodemailer.createTransport({ auth: { pass, user }, host, port, secure: true })
   return transporter
 }
 
-export async function sendMail({ to, subject, html }: MailOptions): Promise<void> {
+export async function sendMail({ html, subject, to }: MailOptions): Promise<void> {
   const from = process.env.SMTP_FROM
   const transport = getTransporter()
 
@@ -36,5 +36,5 @@ export async function sendMail({ to, subject, html }: MailOptions): Promise<void
     return
   }
 
-  await transport.sendMail({ from, to, subject, html })
+  await transport.sendMail({ from, html, subject, to })
 }

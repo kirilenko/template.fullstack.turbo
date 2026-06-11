@@ -4,14 +4,14 @@ import { cn } from '../lib/cn'
 
 type TabsCtx = { value: string; onValueChange: (value: string) => void }
 
-const TabsContext = createContext<TabsCtx>({ value: '', onValueChange: () => {} })
+const TabsContext = createContext<TabsCtx>({ onValueChange: () => {}, value: '' })
 
 function Tabs({
-  value,
+  children,
+  className,
   defaultValue = '',
   onValueChange,
-  className,
-  children,
+  value,
   ...props
 }: ComponentProps<'div'> & {
   value?: string
@@ -25,11 +25,11 @@ function Tabs({
   return (
     <TabsContext.Provider
       value={{
-        value: current,
         onValueChange: (v) => {
           if (!controlled) setInternal(v)
           onValueChange?.(v)
         },
+        value: current,
       }}
     >
       <div data-slot="tabs" className={cn('flex flex-col gap-2', className)} {...props}>
@@ -54,12 +54,12 @@ function TabsList({ className, ...props }: ComponentProps<'div'>) {
 }
 
 function TabsTrigger({
-  value,
-  className,
   children,
+  className,
+  value,
   ...props
 }: ComponentProps<'button'> & { value: string }) {
-  const { value: current, onValueChange } = useContext(TabsContext)
+  const { onValueChange, value: current } = useContext(TabsContext)
   const isActive = current === value
 
   return (
@@ -82,9 +82,9 @@ function TabsTrigger({
 }
 
 function TabsContent({
-  value,
-  className,
   children,
+  className,
+  value,
   ...props
 }: ComponentProps<'div'> & { value: string }) {
   const { value: current } = useContext(TabsContext)

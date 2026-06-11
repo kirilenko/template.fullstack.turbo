@@ -12,7 +12,7 @@ export function useAuthWriting(): {
   if (!ctx) throw new Error('useAuthWriting must be used within AuthProvider')
   return {
     signIn: authClient.signIn.email,
-    signUp: authClient.signUp.email,
     signOut: ctx.signOut,
+    signUp: authClient.signUp.email,
   }
 }

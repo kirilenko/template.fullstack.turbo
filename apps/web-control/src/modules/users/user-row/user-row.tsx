@@ -10,7 +10,7 @@ export type UserRowProps = PropsWithRenderLog<{
   onDelete: (id: string) => Promise<boolean>
 }>
 
-function UserRowBase({ user, isCurrentUser, onEdit, onDelete }: UserRowProps) {
+function UserRowBase({ isCurrentUser, onDelete, onEdit, user }: UserRowProps) {
   const [isConfirming, setIsConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 

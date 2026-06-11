@@ -35,8 +35,8 @@ const buttonVariants = cva(
 
 function Button({
   className,
-  variant,
   size,
+  variant,
   ...props
 }: ComponentProps<'button'> & VariantProps<typeof buttonVariants>) {
   return (

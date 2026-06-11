@@ -7,12 +7,12 @@ import { Input } from '@packages/ui'
 
 type EditingState = { item: NewsItem | null; title: string; content: string; published: boolean }
 
-const EMPTY_FORM: EditingState = { item: null, title: '', content: '', published: false }
+const EMPTY_FORM: EditingState = { content: '', item: null, published: false, title: '' }
 
 const NewsRow = memo(function NewsRow({
   item,
-  onEdit,
   onDelete,
+  onEdit,
 }: {
   item: NewsItem
   onEdit: (item: NewsItem) => void
@@ -93,20 +93,20 @@ const NewsRow = memo(function NewsRow({
 export function NewsPage({ initialNews }: { initialNews: NewsItem[] }): JSX.Element {
   useRenderLog()('NewsPage')()
   const { news, setNews } = useNewsReading(initialNews)
-  const { saving, createNews, updateNews, deleteNews, error } = useNewsWriting(setNews)
+  const { createNews, deleteNews, error, saving, updateNews } = useNewsWriting(setNews)
 
   const [editing, setEditing] = useState<EditingState | null>(null)
 
   const openCreate = useCallback(() => setEditing(EMPTY_FORM), [])
   const openEdit = useCallback(
     (item: NewsItem) =>
-      setEditing({ item, title: item.title, content: item.content, published: item.published }),
+      setEditing({ content: item.content, item, published: item.published, title: item.title }),
     [],
   )
 
   const handleSave = useCallback(async () => {
     if (!editing) return
-    const payload = { title: editing.title, content: editing.content, published: editing.published }
+    const payload = { content: editing.content, published: editing.published, title: editing.title }
     const ok = editing.item
       ? await updateNews(editing.item.id, payload)
       : await createNews(payload)

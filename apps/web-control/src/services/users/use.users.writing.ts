@@ -45,5 +45,5 @@ export function useUsersWriting(setUsers: React.Dispatch<React.SetStateAction<Us
     }
   }, [setUsers])
 
-  return { saving, error, updateUser, deleteUser }
+  return { deleteUser, error, saving, updateUser }
 }

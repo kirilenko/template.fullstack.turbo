@@ -18,7 +18,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', to: paths.home },
   { label: 'Пользователи', to: paths.users },
-  { label: 'Новости', to: paths.news, preload: 'intent' },
+  { label: 'Новости', preload: 'intent', to: paths.news },
   { label: 'Профиль', to: paths.profile },
 ]
 
@@ -33,7 +33,7 @@ export function Layout(): JSX.Element {
           <span className="font-semibold text-sidebar-foreground">Admin</span>
         </div>
         <nav className="flex flex-col gap-1 p-2">
-          {NAV_ITEMS.map(({ label, to, preload }) => (
+          {NAV_ITEMS.map(({ label, preload, to }) => (
             <Link
               key={to}
               to={to}

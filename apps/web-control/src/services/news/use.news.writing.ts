@@ -63,5 +63,5 @@ export function useNewsWriting(setNews: React.Dispatch<React.SetStateAction<News
     }
   }, [setNews])
 
-  return { saving, error, createNews, updateNews, deleteNews }
+  return { createNews, deleteNews, error, saving, updateNews }
 }

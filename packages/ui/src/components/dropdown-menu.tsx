@@ -36,8 +36,8 @@ function DropdownMenu({ children }: { children: ReactNode }) {
 }
 
 function DropdownMenuTrigger({
-  children,
   asChild,
+  children,
   ...props
 }: {
   children: ReactNode
@@ -74,10 +74,10 @@ function DropdownMenuTrigger({
 }
 
 function DropdownMenuContent({
-  children,
   align = 'center',
-  sideOffset = 4,
+  children,
   className,
+  sideOffset = 4,
   style,
   ...props
 }: {
@@ -87,15 +87,15 @@ function DropdownMenuContent({
 } & ComponentProps<'div'>) {
   const { open, setOpen, triggerRef } = useContext(DropdownMenuContext)
   const contentRef = useRef<HTMLDivElement>(null)
-  const [pos, setPos] = useState({ top: 0, left: 0, right: 0 })
+  const [pos, setPos] = useState({ left: 0, right: 0, top: 0 })
 
   useEffect(() => {
     if (!open || !triggerRef.current) return
     const rect = triggerRef.current.getBoundingClientRect()
     setPos({
-      top: rect.bottom + sideOffset,
       left: rect.left,
       right: window.innerWidth - rect.right,
+      top: rect.bottom + sideOffset,
     })
   }, [open, sideOffset, triggerRef])
 
@@ -160,11 +160,11 @@ function DropdownMenuGroup({ className, ...props }: ComponentProps<'div'>) {
 }
 
 function DropdownMenuItem({
-  className,
-  style,
-  onClick,
   children,
+  className,
   inset,
+  onClick,
+  style,
   ...props
 }: ComponentProps<'div'> & { inset?: boolean }) {
   const { setOpen } = useContext(DropdownMenuContext)
@@ -240,7 +240,7 @@ function DropdownMenuSub({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
-function DropdownMenuSubTrigger({ className, children, ...props }: ComponentProps<'div'>) {
+function DropdownMenuSubTrigger({ children, className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       className={cn('flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm', className)}
@@ -261,8 +261,8 @@ function DropdownMenuSubContent({ className, ...props }: ComponentProps<'div'>) 
 }
 
 function DropdownMenuCheckboxItem({
-  className,
   children,
+  className,
   ...props
 }: ComponentProps<'div'> & { checked?: boolean }) {
   return (
@@ -280,7 +280,7 @@ function DropdownMenuRadioGroup({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
-function DropdownMenuRadioItem({ className, children, ...props }: ComponentProps<'div'>) {
+function DropdownMenuRadioItem({ children, className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       role="menuitemradio"

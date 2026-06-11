@@ -11,7 +11,7 @@ type Props = {
   languageLabels: Record<Language, string>
 }
 
-const LanguageSwitcher: FC<Props> = ({ languages, languageLabels }) => {
+const LanguageSwitcher: FC<Props> = ({ languageLabels, languages }) => {
   const { language, setLanguage } = useLanguage()
   const navigate = useNavigate()
   const params = useParams()

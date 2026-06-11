@@ -7,5 +7,5 @@ const ProfilePage = lazyRouteComponent(() =>
 )
 
 export function createProfileRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
-  return createRoute({ getParentRoute, path: paths.profile, component: ProfilePage })
+  return createRoute({ component: ProfilePage, getParentRoute, path: paths.profile })
 }

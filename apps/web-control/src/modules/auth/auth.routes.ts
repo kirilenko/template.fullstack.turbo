@@ -8,17 +8,17 @@ import { RegisterPage } from './register.page'
 import { UnauthorizedPage } from './unauthorized.page'
 
 export function createLoginRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
-  return createRoute({ getParentRoute, path: paths.login, component: LoginPage })
+  return createRoute({ component: LoginPage, getParentRoute, path: paths.login })
 }
 
 export function createRegisterRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
-  return createRoute({ getParentRoute, path: paths.register, component: RegisterPage })
+  return createRoute({ component: RegisterPage, getParentRoute, path: paths.register })
 }
 
 export function createLogoutRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
-  return createRoute({ getParentRoute, path: paths.logout, component: LogoutPage })
+  return createRoute({ component: LogoutPage, getParentRoute, path: paths.logout })
 }
 
 export function createUnauthorizedRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
-  return createRoute({ getParentRoute, path: paths.unauthorized, component: UnauthorizedPage })
+  return createRoute({ component: UnauthorizedPage, getParentRoute, path: paths.unauthorized })
 }

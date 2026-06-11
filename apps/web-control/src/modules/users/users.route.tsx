@@ -8,13 +8,13 @@ import { UsersPage } from './users.page'
 
 export function createUsersRoute<TParent extends AnyRoute>(getParentRoute: () => TParent) {
   const route = createRoute({
-    getParentRoute,
-    path: paths.users,
-    loader: () => apiClient.admin.users.list(),
     component: function UsersPageLoaded() {
       const users = route.useLoaderData() as User[]
       return <UsersPage initialUsers={users} />
     },
+    getParentRoute,
+    loader: () => apiClient.admin.users.list(),
+    path: paths.users,
   })
   return route
 }

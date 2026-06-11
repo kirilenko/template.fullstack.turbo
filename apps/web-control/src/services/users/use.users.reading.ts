@@ -7,5 +7,5 @@ export function useUsersReading(initialUsers: User[]): {
   setUsers: React.Dispatch<React.SetStateAction<User[]>>
 } {
   const [users, setUsers] = useState<User[]>(initialUsers)
-  return { users, setUsers }
+  return { setUsers, users }
 }

@@ -23,15 +23,15 @@ type NewsRow = {
 }
 
 const createNewsSchema = z.object({
-  title: z.string().min(1).max(200),
   content: z.string().min(1),
   published: z.boolean().default(false),
+  title: z.string().min(1).max(200),
 })
 
 const updateNewsSchema = z.object({
-  title: z.string().min(1).max(200).optional(),
   content: z.string().min(1).optional(),
   published: z.boolean().optional(),
+  title: z.string().min(1).max(200).optional(),
 })
 
 const updateUserSchema = z.object({
@@ -40,12 +40,12 @@ const updateUserSchema = z.object({
 })
 
 const userFields = {
+  createdAt: users.createdAt,
+  email: users.email,
+  emailVerified: users.emailVerified,
   id: users.id,
   name: users.name,
-  email: users.email,
   role: users.role,
-  emailVerified: users.emailVerified,
-  createdAt: users.createdAt,
 }
 
 export const adminRoute = new Hono<Env>()

@@ -13,13 +13,13 @@ type EditingState = { user: User; name: string; role: 'admin' | 'user' }
 export function UsersPage({ initialUsers }: { initialUsers: User[] }): JSX.Element {
   useRenderLog()('UsersPage')()
   const { user: currentUser } = useAuthReading()
-  const { users, setUsers } = useUsersReading(initialUsers)
-  const { saving, updateUser, deleteUser, error } = useUsersWriting(setUsers)
+  const { setUsers, users } = useUsersReading(initialUsers)
+  const { deleteUser, error, saving, updateUser } = useUsersWriting(setUsers)
 
   const [editing, setEditing] = useState<EditingState | null>(null)
 
   const openEdit = useCallback((user: User) =>
-    setEditing({ user, name: user.name, role: (user.role as 'admin' | 'user') ?? 'user' }), [])
+    setEditing({ name: user.name, role: (user.role as 'admin' | 'user') ?? 'user', user }), [])
 
   const handleSave = useCallback(async () => {
     if (!editing) return

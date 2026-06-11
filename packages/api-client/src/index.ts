@@ -53,30 +53,30 @@ export function createApiClient(baseUrl: string, options?: ClientOptions) {
 
   return {
     admin: {
-      users: {
-        list: (): Promise<User[]> => callRpc(client.api.admin.users.$get()),
-        update: (id: string, data: { name?: string; role?: 'admin' | 'user' }): Promise<User> =>
-          callRpc(client.api.admin.users[':id'].$patch({ param: { id }, json: data })),
-        delete: (id: string): Promise<{ success: true }> =>
-          callRpc(client.api.admin.users[':id'].$delete({ param: { id } })),
-      },
       news: {
-        list: (): Promise<NewsItem[]> => callRpc(client.api.admin.news.$get()),
         create: (data: NewsPayload): Promise<NewsItem> =>
           callRpc(client.api.admin.news.$post({ json: data })),
-        update: (id: string, data: Partial<NewsPayload>): Promise<NewsItem> =>
-          callRpc(client.api.admin.news[':id'].$patch({ param: { id }, json: data })),
         delete: (id: string): Promise<{ success: true }> =>
           callRpc(client.api.admin.news[':id'].$delete({ param: { id } })),
+        list: (): Promise<NewsItem[]> => callRpc(client.api.admin.news.$get()),
+        update: (id: string, data: Partial<NewsPayload>): Promise<NewsItem> =>
+          callRpc(client.api.admin.news[':id'].$patch({ json: data, param: { id } })),
+      },
+      users: {
+        delete: (id: string): Promise<{ success: true }> =>
+          callRpc(client.api.admin.users[':id'].$delete({ param: { id } })),
+        list: (): Promise<User[]> => callRpc(client.api.admin.users.$get()),
+        update: (id: string, data: { name?: string; role?: 'admin' | 'user' }): Promise<User> =>
+          callRpc(client.api.admin.users[':id'].$patch({ json: data, param: { id } })),
       },
     },
     me: {
+      delete: (): Promise<{ success: true }> =>
+        callRpc(client.api.users.me.$delete()),
       get: (): Promise<User & { image: string | null; updatedAt: string }> =>
         callRpc(client.api.users.me.$get()),
       update: (data: { name?: string }): Promise<User & { image: string | null; updatedAt: string }> =>
         callRpc(client.api.users.me.$patch({ json: data })),
-      delete: (): Promise<{ success: true }> =>
-        callRpc(client.api.users.me.$delete()),
     },
   }
 }
