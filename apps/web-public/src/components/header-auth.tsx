@@ -1,11 +1,12 @@
 import { useRenderLog } from 'react-render-log'
+import { useStore } from '@nanostores/react'
 
 import { RenderLogIslandProvider } from '@/libs/render-log-provider'
-import { authClient } from '@/services/auth/auth.client'
+import { $session } from '@/stores/session'
 
 function HeaderAuthInner() {
   useRenderLog()('HeaderAuth')()
-  const { data: session, isPending } = authClient.useSession()
+  const { data: session, isPending } = useStore($session)
 
   if (isPending) return <div className="h-8 w-20 animate-pulse rounded bg-muted" />
 
