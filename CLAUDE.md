@@ -14,6 +14,7 @@ apps/
   web-public/      # Public site + user cabinet: Astro + React islands (port 5182)
   web-control/     # Admin panel: React + Vite + TanStack Router (port 5181)
 packages/
+  api-client/      # Typed Hono RPC client factories (shared across web and mobile)
   config-eslint/   # Shared ESLint config (eslint-config-k8)
   config-tailwind/ # Shared Tailwind theme (shadcn tokens, dark mode)
   lib/             # Shared utilities (env, theme, router, i18n, style-helpers)
@@ -106,6 +107,20 @@ pnpm lint             # ESLint + Prettier across all packages
 pnpm test             # Vitest across all packages
 pnpm build            # Build all packages
 ```
+
+### packages/api-client — типизированный HTTP-клиент
+
+Обёртка над Hono RPC (`hc<AppType>`). Экспортирует отдельные фабрики по уровню доступа — каждое приложение берёт только нужное:
+
+| Фабрика             | Эндпоинты                 | Кто использует                         |
+| ------------------- | ------------------------- | -------------------------------------- |
+| `createAdminClient` | `/api/admin/*`            | web-control, mobile-admin              |
+| `createUserClient`  | `/api/users/*`            | web-public, mobile-public, web-control |
+| `createApiClient`   | admin + user (комбинация) | web-control (удобство)                 |
+
+Клиент использует стандартный `fetch` → работает в браузере, Node и React Native без изменений.
+
+Типы `User`, `NewsItem`, `MeUser` определены здесь и реэкспортируются в `apps/*/services` — единственный источник правды.
 
 ## Key Technical Decisions
 

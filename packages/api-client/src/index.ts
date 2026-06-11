@@ -13,7 +13,6 @@ export class ApiError extends Error {
 }
 
 // Serialized shapes matching the runtime JSON the API sends.
-// Defined here so they stay consistent between the client and the re-exported types.
 export type User = {
   id: string
   name: string
@@ -32,6 +31,11 @@ export type NewsItem = {
   updatedAt: string
 }
 
+export type ClientOptions = {
+  init?: RequestInit
+  headers?: Record<string, string> | (() => Record<string, string> | Promise<Record<string, string>>)
+}
+
 async function callRpc<T>(responsePromise: Promise<{ ok: boolean; status: number; json: () => Promise<unknown> }>): Promise<T> {
   const res = await responsePromise
   const data = await res.json()
@@ -41,42 +45,61 @@ async function callRpc<T>(responsePromise: Promise<{ ok: boolean; status: number
   return data as T
 }
 
-type ClientOptions = {
-  init?: RequestInit
-  headers?: Record<string, string> | (() => Record<string, string> | Promise<Record<string, string>>)
-}
+type NewsPayload = { content: string; published: boolean; title: string }
 
-type NewsPayload = { title: string; content: string; published: boolean }
+// --- Admin: /api/admin/* ---
+// For web-control, mobile-admin, etc.
 
-export function createApiClient(baseUrl: string, options?: ClientOptions) {
+export function createAdminClient(baseUrl: string, options?: ClientOptions) {
   const client = hc<AppType>(baseUrl, options)
 
   return {
-    admin: {
-      news: {
-        create: (data: NewsPayload): Promise<NewsItem> =>
-          callRpc(client.api.admin.news.$post({ json: data })),
-        delete: (id: string): Promise<{ success: true }> =>
-          callRpc(client.api.admin.news[':id'].$delete({ param: { id } })),
-        list: (): Promise<NewsItem[]> => callRpc(client.api.admin.news.$get()),
-        update: (id: string, data: Partial<NewsPayload>): Promise<NewsItem> =>
-          callRpc(client.api.admin.news[':id'].$patch({ json: data, param: { id } })),
-      },
-      users: {
-        delete: (id: string): Promise<{ success: true }> =>
-          callRpc(client.api.admin.users[':id'].$delete({ param: { id } })),
-        list: (): Promise<User[]> => callRpc(client.api.admin.users.$get()),
-        update: (id: string, data: { name?: string; role?: 'admin' | 'user' }): Promise<User> =>
-          callRpc(client.api.admin.users[':id'].$patch({ json: data, param: { id } })),
-      },
+    news: {
+      create: (data: NewsPayload): Promise<NewsItem> =>
+        callRpc(client.api.admin.news.$post({ json: data })),
+      delete: (id: string): Promise<{ success: true }> =>
+        callRpc(client.api.admin.news[':id'].$delete({ param: { id } })),
+      list: (): Promise<NewsItem[]> =>
+        callRpc(client.api.admin.news.$get()),
+      update: (id: string, data: Partial<NewsPayload>): Promise<NewsItem> =>
+        callRpc(client.api.admin.news[':id'].$patch({ json: data, param: { id } })),
     },
+    users: {
+      delete: (id: string): Promise<{ success: true }> =>
+        callRpc(client.api.admin.users[':id'].$delete({ param: { id } })),
+      list: (): Promise<User[]> =>
+        callRpc(client.api.admin.users.$get()),
+      update: (id: string, data: { name?: string; role?: 'admin' | 'user' }): Promise<User> =>
+        callRpc(client.api.admin.users[':id'].$patch({ json: data, param: { id } })),
+    },
+  }
+}
+
+// --- User: /api/users/* ---
+// For web-public, mobile-public, web-control profile page, etc.
+
+export type MeUser = User & { image: string | null; updatedAt: string }
+
+export function createUserClient(baseUrl: string, options?: ClientOptions) {
+  const client = hc<AppType>(baseUrl, options)
+
+  return {
     me: {
       delete: (): Promise<{ success: true }> =>
         callRpc(client.api.users.me.$delete()),
-      get: (): Promise<User & { image: string | null; updatedAt: string }> =>
+      get: (): Promise<MeUser> =>
         callRpc(client.api.users.me.$get()),
-      update: (data: { name?: string }): Promise<User & { image: string | null; updatedAt: string }> =>
+      update: (data: { name?: string }): Promise<MeUser> =>
         callRpc(client.api.users.me.$patch({ json: data })),
     },
+  }
+}
+
+// --- Convenience wrapper for apps that need both (e.g. web-control) ---
+
+export function createApiClient(baseUrl: string, options?: ClientOptions) {
+  return {
+    admin: createAdminClient(baseUrl, options),
+    me: createUserClient(baseUrl, options).me,
   }
 }
