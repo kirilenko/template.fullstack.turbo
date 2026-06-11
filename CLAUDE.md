@@ -11,7 +11,7 @@ Fullstack monorepo template. pnpm workspaces + Turborepo.
 ```
 apps/
   service-api/     # REST API: Hono + Drizzle + PostgreSQL + Better-Auth + BullMQ (port 3001)
-  web-public/      # Public site + user cabinet: Astro + React islands (port 5182)
+  web-public/      # Public site + user cabinet: TanStack Start + React (port 5182)
   web-control/     # Admin panel: React + Vite + TanStack Router (port 5181)
 packages/
   api-client/      # Typed Hono RPC client factories (shared across web and mobile)
@@ -23,19 +23,18 @@ packages/
 
 ### web-public — публичный сайт и личный кабинет пользователя
 
-Astro + React islands. Доступен для всех зарегистрированных пользователей.
+TanStack Start (Vite + SSR) + React. Доступен для всех зарегистрированных пользователей.
 
-**Страницы:**
+**Страницы** (`src/routes/`):
 
 - `/` — лендинг
 - `/sign-in` — вход
 - `/register` — регистрация (с подтверждением email)
 - `/forgot-password` — запрос сброса пароля
 - `/reset-password` — установка нового пароля по токену
-- `/profile` — личный кабинет (требует авторизации)
+- `/profile` — личный кабинет (server-side auth check через `createServerFn`)
 
-Auth-состояние в шапке (`HeaderAuth`) — React island, `client:load`.
-Страница `/profile` редиректит на `/sign-in` если пользователь не авторизован (client-side).
+Auth-состояние в шапке (`HeaderAuth`) — обычный React-компонент в `__root.tsx`, читает `$session` из `src/stores/session.ts` (nanostores, обёртка над better-auth).
 
 ### web-control — панель администратора
 
@@ -129,8 +128,8 @@ pnpm build            # Build all packages
 - **DB**: PostgreSQL 17 via Drizzle ORM — text IDs for auth tables
 - **Queue**: BullMQ + Redis 7 — worker runs as separate process/container from the same image
 - **Worker scaling**: uncomment `deploy.replicas` in `dokploy/*/compose.yml`
-- **web-control**: TanStack Router — does NOT use `packages/lib/router` (React Router v7)
-- **web-public**: Astro + React islands (NOT SPA) — auth components use `client:load` / `client:only="react"`
+- **web-control**: TanStack Router SPA — does NOT use `packages/lib/router` (React Router v7)
+- **web-public**: TanStack Start SSR — file-based routing, server-side auth on `/profile`, nanostores for session state
 - **Ports**: synced from `../../ports.yml` via `scripts/sync-ports.sh` → `.env.ports.local`
 
 ## Deployment

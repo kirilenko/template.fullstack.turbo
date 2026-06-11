@@ -9,7 +9,7 @@ Fullstack monorepo template: Hono API + Astro (public site) + React (admin panel
 | Layer       | Tech                                                   |
 | ----------- | ------------------------------------------------------ |
 | API         | Hono · Drizzle ORM · PostgreSQL · Better-Auth · BullMQ |
-| Public site | Astro · React islands · Tailwind v4                    |
+| Public site | TanStack Start · React · Tailwind v4                   |
 | Admin panel | React · Vite · TanStack Router · Tailwind v4           |
 | Infra       | pnpm workspaces · Turborepo · Docker · Dokploy         |
 
@@ -20,7 +20,7 @@ Fullstack monorepo template: Hono API + Astro (public site) + React (admin panel
 ```
 apps/
   service-api/   # REST API (port 3001)
-  web-public/    # Public site + user cabinet (port 5182)
+  web-public/    # Public site + user cabinet — TanStack Start SSR (port 5182)
   web-control/   # Admin panel (port 5181)
 packages/
   api-client/    # Typed Hono RPC client factories — shared across web and mobile
@@ -34,7 +34,7 @@ packages/
 
 #### web-public — public site + user cabinet
 
-Astro + React islands. Available to all registered users.
+TanStack Start (SSR) + React. Available to all registered users.
 
 - `/` — landing
 - `/sign-in`, `/register` — auth (email verification required)
