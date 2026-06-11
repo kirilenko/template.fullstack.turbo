@@ -11,20 +11,21 @@
     "start": "astro preview"
   },
   "dependencies": {
-    "@apps/service-api": "workspace:*",
     "@astrojs/check": "^0.9.9",
     "@astrojs/react": "^5.0.4",
+    "@packages/api-client": "workspace:*",
     "@packages/config-tailwind": "workspace:*",
+    "@packages/lib": "workspace:*",
     "astro": "^6.3.1",
     "better-auth": "^1.6.10",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "react-render-log": "^1.2.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "react-render-log": "^1.2.0",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.3",
     "vite": "^7.3.2"

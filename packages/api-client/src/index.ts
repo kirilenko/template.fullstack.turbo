@@ -1,6 +1,9 @@
 import { hc } from 'hono/client'
 
 import type { AppType } from '@apps/service-api/src/app'
+import type { auth } from '@apps/service-api/src/auth'
+
+export type Auth = typeof auth
 
 export class ApiError extends Error {
   status: number

@@ -11,7 +11,6 @@ export default defineConfig({
   devToolbar: { enabled: false },
   integrations: [react()],
   vite: {
-    // @ts-ignore — vite plugin type mismatch between @tailwindcss/vite and astro
     plugins: [tailwindcss()],
   },
 })

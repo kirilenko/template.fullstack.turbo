@@ -4,7 +4,9 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@packages/api-client": ["../../packages/api-client/src/index.ts"],
+      "@packages/lib/*": ["../../packages/lib/src/*/index.ts"]
     }
   }
 }
