@@ -17,7 +17,9 @@ export type SessionState = {
 type SourceState = SessionState & { isRefetching: boolean; error: unknown; refetch: unknown }
 const _source = authClient.$store.atoms['session'] as WritableAtom<SourceState>
 
-export const $session = atom<SessionState>(_source.get())
+// Always start with isPending:true so the server-rendered skeleton matches
+// the client's initial render. The subscriber fires when the fetch resolves.
+export const $session = atom<SessionState>({ data: null, isPending: true })
 
 _source.subscribe((next) => {
   const prev = $session.get()
