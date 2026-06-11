@@ -7,7 +7,7 @@
     "clean": "rm -rf node_modules dist .turbo .output",
     "dev": "dotenv -e ../../.env.ports.local -e ../../.env.local -- vite dev",
     "generate": "tsr generate",
-    "typecheck": "tsr generate && tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsr generate && tsc -p tsconfig.json",
     "build": "vite build",
     "start": "node .output/server/index.mjs"
   },
@@ -34,6 +34,7 @@
     "@vitejs/plugin-react": "^4.3.0",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.3",
-    "vite": "^7.3.2"
+    "vite": "^7.3.2",
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }
