@@ -1,12 +1,16 @@
-import { atom } from 'nanostores'
+import type { WritableAtom } from 'nanostores'
 
-import type { authClient } from '@/services/auth/auth.client'
+import { authClient } from '@/services/auth/auth.client'
 
 export type SessionData = typeof authClient.$Infer.Session | null
 
 export type SessionState = {
   data: SessionData
+  error: unknown
   isPending: boolean
 }
 
-export const $session = atom<SessionState>({ data: null, isPending: true })
+// better-auth internally stores session in a nanostores atom.
+// Exposing it directly means useSession() and useStore($session)
+// subscribe to the exact same atom — no sync, no extra renders.
+export const $session = authClient.$store.atoms['session'] as WritableAtom<SessionState>

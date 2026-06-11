@@ -33,25 +33,25 @@ OtherIsland            ← reader (useStore only, no API call)
 
 ### Session store
 
-`src/stores/session.ts` holds the current auth session. `HeaderAuth` is the **only** island that calls `authClient.useSession()` and syncs the result into `$session`:
+`src/stores/session.ts` exposes better-auth's **internal** session atom directly:
 
 ```ts
-// header-auth.tsx — the session writer
-const { data, isPending } = authClient.useSession()
-useEffect(() => { $session.set({ data: data ?? null, isPending }) }, [data, isPending])
+export const $session = authClient.$store.atoms['session'] as WritableAtom<SessionState>
 ```
 
-Every other island that needs session reads from the atom:
+`authClient.useSession()` and `useStore($session)` subscribe to the exact same nanostores atom — no intermediate atom, no `useEffect` sync, no extra renders.
+
+`HeaderAuth` calls `authClient.useSession()` (convenient typed hook). Every other island reads the same atom via `useStore`:
 
 ```ts
-// any-other-island.tsx — reader
+// any-other-island.tsx
 import { useStore } from '@nanostores/react'
 import { $session } from '@/stores/session'
 
 const { data: session, isPending } = useStore($session)
 ```
 
-**Why this matters:** if every island calls `authClient.useSession()` independently, each subscribes to better-auth's internal session atom separately. When a second island hydrates and subscribes, it triggers an extra re-render in the first island. The writer/reader split eliminates this.
+**Why this matters:** if every island calls `authClient.useSession()` independently, each subscribes separately. When a second island hydrates, it triggers an extra re-render in the first. The shared atom eliminates this.
 
 ---
 
