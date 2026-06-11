@@ -4,7 +4,7 @@ import { useStore } from '@nanostores/react'
 import { $session } from '@/stores/session'
 
 export function HeaderAuth() {
-  useRenderLog()('HeaderAuth')()
+  useRenderLog()('HeaderAuth')('expected: 4 in dev (SSR hydration + session fetch)')
   const { data: session, isPending } = useStore($session)
 
   if (isPending) return <div className="h-8 w-20 animate-pulse rounded bg-muted" />
