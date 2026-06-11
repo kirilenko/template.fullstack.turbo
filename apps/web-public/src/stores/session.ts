@@ -18,10 +18,13 @@ type SourceState = SessionState & { isRefetching: boolean; error: unknown; refet
 const _source = authClient.$store.atoms['session'] as WritableAtom<SourceState>
 
 // Always start with isPending:true so the server-rendered skeleton matches
-// the client's initial render. The subscriber fires when the fetch resolves.
+// the client's initial render.
+// Use listen() not subscribe() — subscribe() fires immediately with the current
+// value, which could be isPending:false if a fast 404 resolved before hydration,
+// causing a hydration mismatch. listen() only fires on future changes.
 export const $session = atom<SessionState>({ data: null, isPending: true })
 
-_source.subscribe((next) => {
+_source.listen((next) => {
   const prev = $session.get()
   if (prev.data !== next.data || prev.isPending !== next.isPending) {
     $session.set({ data: next.data, isPending: next.isPending })
