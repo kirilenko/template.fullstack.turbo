@@ -1,10 +1,9 @@
 import { useRenderLog } from 'react-render-log'
 import { useStore } from '@nanostores/react'
 
-import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { $session } from '@/stores/session'
 
-function HeaderAuthInner() {
+export function HeaderAuth() {
   useRenderLog()('HeaderAuth')()
   const { data: session, isPending } = useStore($session)
 
@@ -33,8 +32,4 @@ function HeaderAuthInner() {
       </a>
     </div>
   )
-}
-
-export default function HeaderAuth() {
-  return <RenderLogIslandProvider><HeaderAuthInner /></RenderLogIslandProvider>
 }

@@ -1,18 +1,12 @@
-import { useEffect } from 'react'
 import { useRenderLog } from 'react-render-log'
+import { useStore } from '@nanostores/react'
 
-import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { authClient } from '@/services/auth/auth.client'
+import { $session } from '@/stores/session'
 
-function ProfileSectionInner() {
+export function ProfileSection() {
   useRenderLog()('ProfileSection')()
-  const { data: session, isPending } = authClient.useSession()
-
-  useEffect(() => {
-    if (!isPending && !session?.user) {
-      window.location.href = '/sign-in'
-    }
-  }, [session, isPending])
+  const { data: session, isPending } = useStore($session)
 
   if (isPending) {
     return (
@@ -57,8 +51,4 @@ function ProfileSectionInner() {
       </div>
     </div>
   )
-}
-
-export default function ProfileSection() {
-  return <RenderLogIslandProvider><ProfileSectionInner /></RenderLogIslandProvider>
 }

@@ -1,23 +1,20 @@
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
+import { useSearch } from '@tanstack/react-router'
 
-import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { authClient } from '@/services/auth/auth.client'
 
-function ResetPasswordFormInner() {
+export function ResetPasswordForm() {
   useRenderLog()('ResetPasswordForm')()
+  const search = useSearch({ strict: false }) as { token?: string; error?: string }
+  const token = search.token ?? null
+  const urlError = search.error ?? null
+
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
-
-  const [token] = useState(() =>
-    typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('token') : null
-  )
-  const [urlError] = useState(() =>
-    typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('error') : null
-  )
 
   if (urlError === 'INVALID_TOKEN' || !token) {
     return (
@@ -59,7 +56,7 @@ function ResetPasswordFormInner() {
     setLoading(true)
 
     try {
-      const result = await authClient.resetPassword({ newPassword: password, token: token! })
+      const result = await authClient.resetPassword({ newPassword: password, token })
       if (result.error) {
         setError(result.error.message ?? 'Ошибка сброса пароля')
         setLoading(false)
@@ -104,8 +101,4 @@ function ResetPasswordFormInner() {
       </div>
     </div>
   )
-}
-
-export default function ResetPasswordForm() {
-  return <RenderLogIslandProvider><ResetPasswordFormInner /></RenderLogIslandProvider>
 }

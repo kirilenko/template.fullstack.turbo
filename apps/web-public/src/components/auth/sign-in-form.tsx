@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
 import { useStore } from '@nanostores/react'
+import { useNavigate } from '@tanstack/react-router'
 
-import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { authClient } from '@/services/auth/auth.client'
 import { $session } from '@/stores/session'
 
-function SignInFormInner() {
+export function SignInForm() {
   useRenderLog()('SignInForm')()
+  const navigate = useNavigate()
   const { data: session, isPending } = useStore($session)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,7 +17,7 @@ function SignInFormInner() {
   const [loading, setLoading] = useState(false)
 
   if (!isPending && session?.user) {
-    window.location.href = '/profile'
+    void navigate({ to: '/profile' })
     return null
   }
 
@@ -32,7 +33,7 @@ function SignInFormInner() {
         setLoading(false)
         return
       }
-      window.location.href = '/profile'
+      void navigate({ to: '/profile' })
     } catch {
       setError('Ошибка входа')
       setLoading(false)
@@ -54,15 +55,9 @@ function SignInFormInner() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              autoComplete="email"
-            />
+              autoComplete="email" />
           </div>
 
           <div className="space-y-2">
@@ -71,30 +66,19 @@ function SignInFormInner() {
               <a href="/forgot-password" className="text-xs text-primary hover:underline">Забыли пароль?</a>
             </div>
             <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+              <input id="password" type={showPassword ? 'text' : 'password'} value={password}
+                onChange={(e) => setPassword(e.target.value)} required
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
+                autoComplete="current-password" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={!email.includes('@') || !password || loading}
-            className="flex h-10 w-full items-center justify-center rounded-md bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-          >
+          <button type="submit" disabled={!email.includes('@') || !password || loading}
+            className="flex h-10 w-full items-center justify-center rounded-md bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50">
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
@@ -106,10 +90,6 @@ function SignInFormInner() {
       </div>
     </div>
   )
-}
-
-export default function SignInForm() {
-  return <RenderLogIslandProvider><SignInFormInner /></RenderLogIslandProvider>
 }
 
 function EyeIcon() {

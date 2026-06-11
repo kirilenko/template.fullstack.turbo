@@ -29,9 +29,11 @@ RUN if [ -f ".env.${BRANCH}" ]; then \
     fi
 
 # ---
-FROM nginx:1.29-alpine AS runner
-RUN rm -rf /usr/share/nginx/html/*
-COPY --from=builder /app/apps/web-public/dist /usr/share/nginx/html
-COPY apps/web-public/nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM base AS runner
+WORKDIR /app
+COPY --from=builder /app/apps/web-public/.output ./.output
+COPY --from=builder /app/apps/web-public/package.json ./package.json
+
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]

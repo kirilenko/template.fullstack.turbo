@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
+import { useNavigate } from '@tanstack/react-router'
 
-import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { authClient } from '@/services/auth/auth.client'
 
-function RegisterFormInner() {
+export function RegisterForm() {
   useRenderLog()('RegisterForm')()
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -34,7 +35,7 @@ function RegisterFormInner() {
 
     try {
       const result = await authClient.signUp.email({
-        callbackURL: window.location.origin + '/profile',
+        callbackURL: '/profile',
         email,
         name,
         password,
@@ -59,9 +60,10 @@ function RegisterFormInner() {
           <p className="text-sm text-muted-foreground">
             Мы отправили письмо с подтверждением на <strong>{email}</strong>
           </p>
-          <a href="/sign-in" className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+          <button onClick={() => { void navigate({ to: '/sign-in' }) }}
+            className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
             Войти
-          </a>
+          </button>
         </div>
       </div>
     )
@@ -131,10 +133,6 @@ function RegisterFormInner() {
       </div>
     </div>
   )
-}
-
-export default function RegisterForm() {
-  return <RenderLogIslandProvider><RegisterFormInner /></RenderLogIslandProvider>
 }
 
 function EyeIcon() {
