@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import { memo, useCallback, useState } from 'react'
+import { useRenderLog } from 'react-render-log'
 
 import { type NewsItem, useNewsReading, useNewsWriting } from '@/services/news'
 import { Input } from '@packages/ui'
@@ -90,6 +91,7 @@ const NewsRow = memo(function NewsRow({
 })
 
 export function NewsPage({ initialNews }: { initialNews: NewsItem[] }): JSX.Element {
+  useRenderLog()('NewsPage')()
   const { news, setNews } = useNewsReading(initialNews)
   const { saving, createNews, updateNews, deleteNews, error } = useNewsWriting(setNews)
 
