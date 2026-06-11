@@ -37,7 +37,7 @@ export const $session = authClient.$store.atoms['session'] as WritableAtom<Sessi
 
 `authClient.useSession()` and `useStore($session)` subscribe to the exact same nanostores atom — no sync layer, no extra renders.
 
-`HeaderAuth` calls `authClient.useSession()` (typed convenience hook). Any other island that needs session reads from the same atom:
+Every island reads session via `useStore($session)`:
 
 ```ts
 import { useStore } from '@nanostores/react'
@@ -45,6 +45,8 @@ import { $session } from '@/stores/session'
 
 const { data: session, isPending } = useStore($session)
 ```
+
+Do **not** call `authClient.useSession()` directly in islands — it subscribes to better-auth's raw atom which fires on `isRefetching` transitions, producing an extra render per page load.
 
 ### Adding shared state for new features
 
