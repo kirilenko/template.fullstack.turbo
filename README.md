@@ -1,5 +1,7 @@
 # template.fullstack.turbo
 
+[![CI](https://github.com/kirilenko/template.fullstack.turbo/actions/workflows/ci.yml/badge.svg)](https://github.com/kirilenko/template.fullstack.turbo/actions/workflows/ci.yml)
+
 Fullstack monorepo template: Hono API + Astro (public site) + React (admin panel).
 
 ## Stack
