@@ -1,16 +1,24 @@
 import { useState } from 'react'
 import { useRenderLog } from 'react-render-log'
+import { useStore } from '@nanostores/react'
 
 import { RenderLogIslandProvider } from '@/libs/render-log-provider'
 import { authClient } from '@/services/auth/auth.client'
+import { $session } from '@/stores/session'
 
 function SignInFormInner() {
   useRenderLog()('SignInForm')()
+  const { data: session, isPending } = useStore($session)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  if (!isPending && session?.user) {
+    window.location.href = '/profile'
+    return null
+  }
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
