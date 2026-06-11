@@ -19,7 +19,7 @@ export function UsersPage({ initialUsers }: { initialUsers: User[] }): JSX.Eleme
   const [editing, setEditing] = useState<EditingState | null>(null)
 
   const openEdit = useCallback((user: User) =>
-    setEditing({ user, name: user.name, role: user.role ?? 'user' }), [])
+    setEditing({ user, name: user.name, role: (user.role as 'admin' | 'user') ?? 'user' }), [])
 
   const handleSave = useCallback(async () => {
     if (!editing) return

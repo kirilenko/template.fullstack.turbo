@@ -17,55 +17,50 @@ type InferEnvValue<C extends EnvConfigItemValue> =
 
 const parseEnv = <Config extends Record<string, EnvConfigItemValue>>(
   envConfig: Config,
-): { [K in keyof Config]: InferEnvValue<Config[K]> } =>
-  (Object.entries(envConfig) as [keyof Config & string, EnvConfigItemValue][]).reduce(
-    (acc, [key, { required, type = 'string' }]) => {
-      const value = import.meta.env[key]
-      if (required && value === undefined) {
-        throw new Error(`No ${key} provided`)
-      }
+): { [K in keyof Config]: InferEnvValue<Config[K]> } => {
+  const result = {} as Record<string, EnvValue>
 
-      switch (type) {
-        case 'boolean':
-          acc[key] = value === 'true'
-          break
+  for (const [key, { required, type = 'string' }] of Object.entries(envConfig)) {
+    const value = import.meta.env[key]
+    if (required && value === undefined) {
+      throw new Error(`No ${key} provided`)
+    }
 
-        case 'number':
-          acc[key] = Number.isNaN(+value) ? null : +value
-          break
+    switch (type) {
+      case 'boolean':
+        result[key] = value === 'true'
+        break
 
-        case 'protocol':
-          acc[key] = (() => {
-            if (!['http', 'https'].includes(value ?? ''))
-              throw new Error(`${value} should be http or https`)
+      case 'number':
+        result[key] = Number.isNaN(+value) ? null : +value
+        break
 
-            return value
-          })()
-          break
+      case 'protocol':
+        if (!['http', 'https'].includes(value ?? ''))
+          throw new Error(`${value} should be http or https`)
+        result[key] = value
+        break
 
-        case 'string':
-          acc[key] = value ?? null
-          break
+      case 'string':
+        result[key] = value ?? null
+        break
 
-        case 'url':
-          acc[key] = (() => {
-            try {
-              new URL(value ?? '')
-              return value
-            } catch {
-              throw new Error(`Invalid URL: ${value}`)
-            }
-          })()
-          break
+      case 'url':
+        try {
+          new URL(value ?? '')
+          result[key] = value
+        } catch {
+          throw new Error(`Invalid URL: ${value}`)
+        }
+        break
 
-        default:
-          throw new Error(`Unknown type: ${type}`)
-      }
+      default:
+        throw new Error(`Unknown type: ${type}`)
+    }
+  }
 
-      return acc
-    },
-    {} as { [K in keyof Config]: InferEnvValue<Config[K]> },
-  )
+  return result as { [K in keyof Config]: InferEnvValue<Config[K]> }
+}
 
 export type { EnvConfigItemValue, EnvConfig, EnvValue }
 export { parseEnv }
