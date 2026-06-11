@@ -7,8 +7,18 @@ type EnvConfig<Keys extends string> = Record<Keys, EnvConfigItemValue>
 
 type EnvValue = string | number | boolean | null
 
-const parseEnv = <Keys extends string>(envConfig: EnvConfig<Keys>): Record<Keys, EnvValue> =>
-  (Object.entries(envConfig) as [Keys, EnvConfigItemValue][]).reduce(
+// For required fields, infer the non-nullable value type; otherwise allow null.
+type InferEnvValue<C extends EnvConfigItemValue> =
+  C extends { required: true }
+    ? C extends { type: 'number' } ? number
+    : C extends { type: 'boolean' } ? boolean
+    : string
+  : EnvValue
+
+const parseEnv = <Config extends Record<string, EnvConfigItemValue>>(
+  envConfig: Config,
+): { [K in keyof Config]: InferEnvValue<Config[K]> } =>
+  (Object.entries(envConfig) as [keyof Config & string, EnvConfigItemValue][]).reduce(
     (acc, [key, { required, type = 'string' }]) => {
       const value = import.meta.env[key]
       if (required && value === undefined) {
@@ -54,7 +64,7 @@ const parseEnv = <Keys extends string>(envConfig: EnvConfig<Keys>): Record<Keys,
 
       return acc
     },
-    {} as Record<Keys, EnvValue>,
+    {} as { [K in keyof Config]: InferEnvValue<Config[K]> },
   )
 
 export type { EnvConfigItemValue, EnvConfig, EnvValue }
