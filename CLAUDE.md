@@ -11,7 +11,6 @@ Fullstack monorepo template. pnpm workspaces + Turborepo.
 ```
 apps/
   service-api/     # REST API: Hono + Drizzle + PostgreSQL + Better-Auth + BullMQ (port 3001)
-  web-public/      # Public site + user cabinet: TanStack Start + React (port 5182)
   web-control/     # Admin panel: React + Vite + TanStack Router (port 5181)
 packages/
   api-client/      # Typed Hono RPC client factories (shared across web and mobile)
@@ -20,21 +19,6 @@ packages/
   lib/             # Shared utilities (env, theme, router, i18n, style-helpers)
   ui/              # Shared UI components (Button, Input, Label, Card, Select, Tabs, DropdownMenu)
 ```
-
-### web-public — публичный сайт и личный кабинет пользователя
-
-TanStack Start (Vite + SSR) + React. Доступен для всех зарегистрированных пользователей.
-
-**Страницы** (`src/routes/`):
-
-- `/` — лендинг
-- `/sign-in` — вход
-- `/register` — регистрация (с подтверждением email)
-- `/forgot-password` — запрос сброса пароля
-- `/reset-password` — установка нового пароля по токену
-- `/profile` — личный кабинет (server-side auth check через `createServerFn`)
-
-Auth-состояние в шапке (`HeaderAuth`) — обычный React-компонент в `__root.tsx`, читает `$session` из `src/stores/session.ts` (nanostores, обёртка над better-auth).
 
 ### web-control — панель администратора
 
@@ -93,8 +77,6 @@ pnpm dev:stop
 pnpm --filter @apps/service-api dev
 pnpm --filter @apps/service-api dev:worker
 pnpm --filter @apps/web-control dev
-pnpm --filter @apps/web-public dev
-
 # Database
 pnpm db:generate      # Generate Drizzle migrations
 pnpm db:migrate       # Run migrations
@@ -114,7 +96,7 @@ pnpm build            # Build all packages
 | Фабрика             | Эндпоинты                 | Кто использует                         |
 | ------------------- | ------------------------- | -------------------------------------- |
 | `createAdminClient` | `/api/admin/*`            | web-control, mobile-admin              |
-| `createUserClient`  | `/api/users/*`            | web-public, mobile-public, web-control |
+| `createUserClient`  | `/api/users/*`            | mobile-public, web-control             |
 | `createApiClient`   | admin + user (комбинация) | web-control (удобство)                 |
 
 Клиент использует стандартный `fetch` → работает в браузере, Node и React Native без изменений.
@@ -129,7 +111,6 @@ pnpm build            # Build all packages
 - **Queue**: BullMQ + Redis 7 — worker runs as separate process/container from the same image
 - **Worker scaling**: uncomment `deploy.replicas` in `dokploy/*/compose.yml`
 - **web-control**: TanStack Router SPA — does NOT use `packages/lib/router` (React Router v7)
-- **web-public**: TanStack Start SSR — file-based routing, server-side auth on `/profile`, nanostores for session state
 - **Ports**: synced from `../../ports.yml` via `scripts/sync-ports.sh` → `.env.ports.local`
 
 ## Deployment
@@ -152,13 +133,12 @@ Quick start:
 ## Local Development Notes
 
 - **Email links in console**: SMTP не настроен → `mailer.ts` логирует ссылки (верификация, сброс пароля) в консоль `service-api`. Ищи строки `[mailer] →` в выводе API.
-- **CORS / CSRF в dev**: Vite и Astro могут сдвинуть порт если нужный занят. `service-api` разрешает любой `localhost:*` origin и отключает CSRF-проверку Better-Auth когда `NODE_ENV` ≠ `production`.
+- **CORS / CSRF в dev**: Vite может сдвинуть порт если нужный занят. `service-api` разрешает любой `localhost:*` origin и отключает CSRF-проверку Better-Auth когда `NODE_ENV` ≠ `production`.
 - **Первый запуск**: `pnpm dev` делает `db:push --force` — схема применяется напрямую без миграций. Для продакшена: `pnpm db:generate` → закоммить `drizzle/` → `pnpm db:migrate`.
 
 ## Conventions
 
 - Commit format: `type(scope): message` (feat, fix, chore, docs, refactor, test)
-- `packages/lib/router` uses React Router v7 — для использования в web-public Astro islands
 - `web-control` uses TanStack Router independently (does not use `packages/lib/router`)
 - Secrets template in `secrets.template` (copy to `secrets.local`, gitignored)
 - Environment: Node 24.12.0, pnpm 10.26.0

@@ -79,7 +79,7 @@ export function createAdminClient(baseUrl: string, options?: ClientOptions) {
 }
 
 // --- User: /api/users/* ---
-// For web-public, mobile-public, web-control profile page, etc.
+// For mobile-public, web-control profile page, etc.
 
 export type MeUser = User & { image: string | null; updatedAt: string }
 

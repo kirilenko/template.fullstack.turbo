@@ -131,39 +131,6 @@ services:
       - traefik.http.routers.web-control-${BRANCH}-http.entrypoints=web
       - traefik.http.routers.web-control-${BRANCH}-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
 
-  web-public:
-    container_name: app-web-public-prod
-    image: ${DOCKER_REGISTRY}/${DOCKER_USER}/${PROJECT_NAME}-web-public-${BRANCH}:${TAG}
-    pull_policy: always
-    restart: unless-stopped
-    networks:
-      - dokploy-network
-    labels:
-      - environment=main
-      - traefik.enable=true
-
-      # HTTPS — main domain
-      - traefik.http.routers.web-public.rule=Host(`yourdomain.com`)
-      - traefik.http.routers.web-public.entrypoints=websecure
-      - traefik.http.routers.web-public.tls.certresolver=letsencrypt
-      - traefik.http.services.web-public.loadbalancer.server.port=80
-
-      # HTTP → HTTPS
-      - traefik.http.routers.web-public-http.rule=Host(`yourdomain.com`)
-      - traefik.http.routers.web-public-http.entrypoints=web
-      - traefik.http.routers.web-public-http.middlewares=${PROJECT_NAME}-${BRANCH}-https
-
-      # www → main domain redirect
-      - traefik.http.routers.www-redirect.rule=Host(`www.yourdomain.com`)
-      - traefik.http.routers.www-redirect.entrypoints=websecure
-      - traefik.http.routers.www-redirect.tls.certresolver=letsencrypt
-      - traefik.http.routers.www-redirect.middlewares=web-public-www-redirect
-      - traefik.http.routers.www-http.rule=Host(`www.yourdomain.com`)
-      - traefik.http.routers.www-http.entrypoints=web
-      - traefik.http.routers.www-http.middlewares=web-public-www-redirect
-      - traefik.http.middlewares.web-public-www-redirect.redirectregex.regex=^https?://www\.yourdomain\.com/(.*)
-      - traefik.http.middlewares.web-public-www-redirect.redirectregex.replacement=https://yourdomain.com/$1
-      - traefik.http.middlewares.web-public-www-redirect.redirectregex.permanent=true
 
   pg-backup:
     container_name: app-pg-backup-prod

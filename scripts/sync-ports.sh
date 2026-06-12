@@ -27,11 +27,10 @@ parse_port() {
 
 PORT_API=$(parse_port "api")
 PORT_CONTROL=$(parse_port "web-control")
-PORT_PUBLIC=$(parse_port "web-public")
 PORT_PG=$(parse_port "postgres")
 PORT_RD=$(parse_port "redis")
 
-if [ -z "$PORT_API" ] || [ -z "$PORT_CONTROL" ] || [ -z "$PORT_PUBLIC" ] || [ -z "$PORT_PG" ]; then
+if [ -z "$PORT_API" ] || [ -z "$PORT_CONTROL" ] || [ -z "$PORT_PG" ]; then
   echo "Error: could not parse all ports for '$PROJECT' from $PORTS_FILE" >&2
   exit 1
 fi
@@ -39,10 +38,9 @@ fi
 cat > "$OUT_FILE" <<EOF
 PORT=$PORT_API
 PORT_VITE_CONTROL=$PORT_CONTROL
-PORT_ASTRO_PUBLIC=$PORT_PUBLIC
 PORT_POSTGRES=$PORT_PG
 PUBLIC_API_URL=http://localhost:${PORT_API}
-PUBLIC_APP_URL=http://localhost:${PORT_CONTROL},http://localhost:${PORT_PUBLIC}
+PUBLIC_APP_URL=http://localhost:${PORT_CONTROL}
 DATABASE_URL=postgresql://app:app@localhost:${PORT_PG}/app
 EOF
 
@@ -54,4 +52,4 @@ EOF
 fi
 
 echo "Synced ports from $PORTS_FILE → $OUT_FILE"
-echo "  PORT=$PORT_API  PORT_VITE_CONTROL=$PORT_CONTROL  PORT_ASTRO_PUBLIC=$PORT_PUBLIC  PORT_POSTGRES=$PORT_PG  PORT_REDIS=${PORT_RD:-—}"
+echo "  PORT=$PORT_API  PORT_VITE_CONTROL=$PORT_CONTROL  PORT_POSTGRES=$PORT_PG  PORT_REDIS=${PORT_RD:-—}"

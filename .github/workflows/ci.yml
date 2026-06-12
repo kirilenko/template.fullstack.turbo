@@ -133,14 +133,6 @@ jobs:
               - '.nvmrc'
               - '.env.*'
               - '.github/workflows/ci.yml'
-            web-public:
-              - 'apps/web-public/**'
-              - 'packages/**'
-              - 'pnpm-lock.yaml'
-              - 'turbo.json'
-              - '.nvmrc'
-              - '.env.*'
-              - '.github/workflows/ci.yml'
 
       - name: Push Service-API
         if: steps.first-push.outputs.build_all == 'true' || steps.changed-files.outputs.service-api == 'true'
@@ -163,16 +155,6 @@ jobs:
             -f apps/web-control/Dockerfile .
           docker push ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }} --all-tags
 
-      - name: Push Web-Public
-        if: steps.first-push.outputs.build_all == 'true' || steps.changed-files.outputs.web-public == 'true'
-        run: |
-          APP_NAME=web-public
-          docker build \
-            --build-arg BRANCH=${{ env.BRANCH }} \
-            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:${{ env.COMMIT_HASH }} \
-            -t ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }}:latest \
-            -f apps/web-public/Dockerfile .
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}-$APP_NAME-${{ env.BRANCH }} --all-tags
 
   # ─────────────────────────────────────────────────────────────────────────────
   # DEPLOY — раскомментируйте для активации автодеплоя через Dokploy webhook
